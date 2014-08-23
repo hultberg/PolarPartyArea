@@ -49,6 +49,9 @@ public class PolarPartyArea extends JavaPlugin {
 	/* SQL */
 	public MySQL mysqlconnection;
 	
+	/* Configuration */
+	public ConfigurationHandler config;
+	
 	/* Handlers */
 	private UserHandler userHandler;
 	private GroupHandler groupHandler;
@@ -72,6 +75,8 @@ public class PolarPartyArea extends JavaPlugin {
 		log = getLogger();
 		
 		log.info("PolarPartyPlugin starting up...");
+		
+		config.loadConfig();
 		
 		/* Connect mysql */
 		log.info("Connecting to mysql...");
