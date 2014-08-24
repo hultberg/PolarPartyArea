@@ -1,18 +1,14 @@
 name: PolarPartyArea
 version: 1
 author: Hultberg
-main: net.mittnett.edvin.plugin.PolarPartyArea.PolarPartyArea
+main: net.mittnett.edvin.area.PolarPartyArea.PolarPartyArea
 
 commands:
     mod:
        description: Change a users access level
        usage: |
               /<command> [admin/mod/builder/guest] [target] 
-    gr:
-       description: Groupsystem
+    reloadConfig:
+       description: Reload server config
        usage: |
-              /<command> (options...)
-    g:
-       description: Gruppe chat
-       usage: |
-              /<command> [string]
+              /<command>

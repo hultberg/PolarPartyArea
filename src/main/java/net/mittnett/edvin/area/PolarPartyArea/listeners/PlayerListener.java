@@ -1,13 +1,14 @@
 package net.mittnett.edvin.area.PolarPartyArea.listeners;
 
+import net.mittnett.edvin.area.PolarPartyArea.ConfigurationHandler;
 import net.mittnett.edvin.area.PolarPartyArea.PolarPartyArea;
 import net.mittnett.edvin.area.PolarPartyArea.handlers.Broadcaster;
-import net.mittnett.edvin.area.PolarPartyArea.handlers.GroupHandler;
 import net.mittnett.edvin.area.PolarPartyArea.handlers.LogHandler;
 import net.mittnett.edvin.area.PolarPartyArea.handlers.LogType;
 import net.mittnett.edvin.area.PolarPartyArea.handlers.PlayerData;
 import net.mittnett.edvin.area.PolarPartyArea.handlers.UserHandler;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -21,17 +22,16 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 public class PlayerListener implements Listener {
 
-	@SuppressWarnings("unused")
 	private PolarPartyArea plugin;
 	private UserHandler userHandler;
-	private GroupHandler groupHandler;
 	private LogHandler log;
+	private ConfigurationHandler config;
 
 	public PlayerListener(PolarPartyArea plugin) {
 		this.plugin = plugin;
 		this.userHandler = plugin.getUserHandler();
-		this.groupHandler = plugin.getGroupHandler();
 		this.log = plugin.getLogHandler();
+		this.config = plugin.getConfigHandler();
 	}
 	
 	@EventHandler
@@ -43,25 +43,26 @@ public class PlayerListener implements Listener {
 			event.disallow(Result.KICK_BANNED, "You have been banned from the server, no reason has been given.");
 			return;
 		}
+		
+		/* if ongoing game, and player is not in it... temp ban. */
+		if (plugin.hasOngoingGame() && plugin.getPlayer(p.getName()) == null) {
+			event.disallow(Result.KICK_BANNED, "En runde pågår og du er ikke med i den, vennligst logg inn senere.");
+			return;
+		}
 	}
 	
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent event) {
 		Player p = event.getPlayer();
 		
+		/* Send players to temp map */
+		p.teleport(Bukkit.getWorld(config.getTempMap()).getSpawnLocation());
+		
 		this.userHandler.loginUser(p);
 		
 		p.sendMessage(ChatColor.GOLD + "------------- " + ChatColor.DARK_AQUA + "POLARPARTY 23 " + ChatColor.GOLD + "-------------");
-		p.sendMessage("Informasjon om compoen finner du p� www.polarparty.no/pp23/");
-		p.sendMessage("For � sende inn bidraget ditt bruk /compo");
+		p.sendMessage("Informasjon om compoen finner du på www.polarparty.no/pp23/");
 		p.sendMessage("");
-		
-		int invites = this.groupHandler.getInvites(this.userHandler.getUserId(p.getName())).size();
-		if (invites > 0) {
-			p.sendMessage(ChatColor.DARK_GREEN + "Du har " + ChatColor.WHITE + invites + ChatColor.DARK_GREEN + " gruppeinvitasjon"
-					+ (invites > 1 ? "er" : "") + ".");
-			p.sendMessage("");
-		}
 		
 		this.log.log(this.userHandler.getUserId(p.getName()), null, 0, null, 0, 0, p.getAddress().getAddress().getHostAddress(), LogType.JOIN);
 		event.setJoinMessage(this.userHandler.getPrefix(p.getName()) + ChatColor.GREEN + " logget på.");
@@ -75,6 +76,7 @@ public class PlayerListener implements Listener {
 		Broadcaster.broadcastAll(this.userHandler.getPrefix(p.getName()) + ChatColor.RED + " logget av.");
 		
 		this.userHandler.logout(p);
+		plugin.removePlayer(p.getName());
 	}
 	
 	@EventHandler

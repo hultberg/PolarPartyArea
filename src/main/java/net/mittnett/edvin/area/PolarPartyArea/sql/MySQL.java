@@ -8,11 +8,18 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
 
+import net.mittnett.edvin.area.PolarPartyArea.ConfigurationHandler;
 import net.mittnett.edvin.area.PolarPartyArea.PolarPartyArea;
 
 public class MySQL {
 	
 	public Connection mysqlConn;
+	private ConfigurationHandler config;
+	
+	public MySQL(PolarPartyArea plugin)
+	{
+		this.config = plugin.getConfigHandler();
+	}
 
 	public ResultSet select(String query) {
 		try {
@@ -112,7 +119,7 @@ public class MySQL {
 	}
 	
 	public Connection connect() {
-		return connect("localhost", "minecraft", "1234", "minecraft");
+		return connect(config.getHost(), config.getUsername(), config.getPassword(), config.getDatabase());
 	}
 	
 	public Connection connect(String host, String username, String password,
@@ -127,6 +134,11 @@ public class MySQL {
 			e.printStackTrace();
 			return null;
 		}	
+	}
+	
+	public boolean connectFriendly() {
+		this.mysqlConn = this.connect();
+		return this.mysqlConn != null;
 	}
 		
 }
