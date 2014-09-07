@@ -38,14 +38,16 @@
     	<groupId>com.sk89q</groupId>
     	<artifactId>worldedit</artifactId>
     	<version>5.6.3</version>
-    	<scope>system</scope>
-    	<systemPath>${project.basedir}/lib/WorldEdit.jar</systemPath></dependency>
+    	<scope>provided</scope></dependency>
   </dependencies>
   <repositories>
   	<repository>
   		<id>bukkit-repo</id>
   		<url>http://repo.bukkit.org/content/groups/public/</url>
 	</repository>
+  	<repository>
+  		<id>worldedit-repo</id>
+  		<url>http://maven.sk89q.com/repo/</url></repository>
   </repositories>
   <developers>
   	<developer>
