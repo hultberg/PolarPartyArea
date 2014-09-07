@@ -6,12 +6,12 @@ import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.logging.Logger;
 
 import net.mittnett.edvin.area.PolarPartyArea.commands.ReloadConfigCommand;
 import net.mittnett.edvin.area.PolarPartyArea.commands.ModCommand;
 import net.mittnett.edvin.area.PolarPartyArea.handlers.Broadcaster;
+import net.mittnett.edvin.area.PolarPartyArea.handlers.GameHandler;
 import net.mittnett.edvin.area.PolarPartyArea.handlers.LogHandler;
 import net.mittnett.edvin.area.PolarPartyArea.handlers.UserHandler;
 import net.mittnett.edvin.area.PolarPartyArea.listeners.BlockListener;
@@ -23,7 +23,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class PolarPartyArea extends JavaPlugin {
@@ -59,14 +58,7 @@ public class PolarPartyArea extends JavaPlugin {
 	private UserHandler userHandler;
 	private LogHandler logHandler;
 	private Broadcaster broadcaster;
-	
-	/* States */
-	private boolean finished = false;
-	private boolean starting = false;
-	private boolean ongoingBattle = false;
-	
-	/* Maps */
-	private HashMap<String, Player> players = new HashMap<String, Player>();
+	private GameHandler gameHandler;
 	
 	/* Listeners */
 	private PlayerListener playerListener;
@@ -98,11 +90,13 @@ public class PolarPartyArea extends JavaPlugin {
 		userHandler = new UserHandler(this);
 		logHandler = new LogHandler(this);
 		broadcaster = new Broadcaster(this);
+		gameHandler = new GameHandler(this);
 		
 		/* Enable handlers */
 		userHandler.prepare();
 		logHandler.prepare();
 		broadcaster.prepare();
+		gameHandler.prepare();
 		
 		/* Create listeners */
 		playerListener = new PlayerListener(this);
@@ -123,6 +117,7 @@ public class PolarPartyArea extends JavaPlugin {
 	
 	@Override
 	public void onDisable() {
+		gameHandler.cleanup();
 		broadcaster.cleanup();
 		logHandler.cleanup();
 		userHandler.cleanup();
@@ -176,85 +171,14 @@ public class PolarPartyArea extends JavaPlugin {
 		return broadcaster;
 	}
 	
-	/**
-	 * If an game is on-going.
-	 * @return boolean
-	 */
-	public boolean hasOngoingGame()
-	{
-		return this.ongoingBattle;
-	}
-	
-	/**
-	 * Returns if game is starting...
-	 * @return boolean
-	 */
-	public boolean isStarting()
-	{
-		return this.starting;
-	}
-	
-	/**
-	 * Returns if game has finished. This will be true while server is allowing
-	 * people to join.
-	 * 
-	 * @return boolean
-	 */
-	public boolean isFinished()
-	{
-		return this.finished;
-	}
-	
-	/**
-	 * Set ongoing
-	 * @param var1 boolean
-	 */
-	public void setOngoingGame(boolean var1)
-	{
-		this.ongoingBattle = var1;
-	}
-	
-	/**
-	 * 
-	 * @param var1 boolean
-	 */
-	public void setFinished(boolean var1)
-	{
-		this.finished = var1;
-	}
-	
 	public ConfigurationHandler getConfigHandler()
 	{
 		return this.config;
 	}
 	
-	public HashMap<String, Player> getPlayersMapRaw()
+	public GameHandler getGameHandler()
 	{
-		return this.players;
-	}
-	
-	public void addPlayer(Player pl)
-	{
-		this.players.put(pl.getName(), pl);
-	}
-	
-	public void removePlayer(String pl)
-	{
-		this.players.remove(pl);
-	}
-	
-	public Player getPlayer(String pl)
-	{
-		return this.players.get(pl);
-	}
-	
-	/**
-	 * 
-	 * @param var1 boolean
-	 */
-	public void setStarting(boolean var1)
-	{
-		this.starting = var1;
+		return this.gameHandler;
 	}
 
 	/* Save and load functions */

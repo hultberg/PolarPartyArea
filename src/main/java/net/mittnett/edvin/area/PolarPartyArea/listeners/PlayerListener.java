@@ -3,6 +3,7 @@ package net.mittnett.edvin.area.PolarPartyArea.listeners;
 import net.mittnett.edvin.area.PolarPartyArea.ConfigurationHandler;
 import net.mittnett.edvin.area.PolarPartyArea.PolarPartyArea;
 import net.mittnett.edvin.area.PolarPartyArea.handlers.Broadcaster;
+import net.mittnett.edvin.area.PolarPartyArea.handlers.GameHandler;
 import net.mittnett.edvin.area.PolarPartyArea.handlers.LogHandler;
 import net.mittnett.edvin.area.PolarPartyArea.handlers.LogType;
 import net.mittnett.edvin.area.PolarPartyArea.handlers.PlayerData;
@@ -26,12 +27,14 @@ public class PlayerListener implements Listener {
 	private UserHandler userHandler;
 	private LogHandler log;
 	private ConfigurationHandler config;
+	private GameHandler gameHandler;
 
-	public PlayerListener(PolarPartyArea plugin) {
-		this.plugin = plugin;
-		this.userHandler = plugin.getUserHandler();
-		this.log = plugin.getLogHandler();
-		this.config = plugin.getConfigHandler();
+	public PlayerListener(PolarPartyArea instance) {
+		this.plugin = instance;
+		this.userHandler = instance.getUserHandler();
+		this.log = instance.getLogHandler();
+		this.config = instance.getConfigHandler();
+		this.gameHandler = instance.getGameHandler();
 	}
 	
 	@EventHandler
@@ -45,7 +48,7 @@ public class PlayerListener implements Listener {
 		}
 		
 		/* if ongoing game, and player is not in it... temp ban. */
-		if (plugin.hasOngoingGame() && plugin.getPlayer(p.getName()) == null) {
+		if (gameHandler.hasOngoingGame() && gameHandler.getPlayer(p.getName()) == null) {
 			event.disallow(Result.KICK_BANNED, "En runde pågår og du er ikke med i den, vennligst logg inn senere.");
 			return;
 		}
@@ -76,7 +79,7 @@ public class PlayerListener implements Listener {
 		Broadcaster.broadcastAll(this.userHandler.getPrefix(p.getName()) + ChatColor.RED + " logget av.");
 		
 		this.userHandler.logout(p);
-		plugin.removePlayer(p.getName());
+		gameHandler.removePlayer(p.getName());
 	}
 	
 	@EventHandler
