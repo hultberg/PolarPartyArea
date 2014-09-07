@@ -13,6 +13,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
+import net.mittnett.edvin.area.PolarPartyArea.ConfigurationHandler;
 import net.mittnett.edvin.area.PolarPartyArea.PolarPartyArea;
 import net.mittnett.edvin.area.PolarPartyArea.sql.MySQL;
 
@@ -21,6 +22,7 @@ public class UserHandler extends BaseHandler {
 	public HashMap<String, PlayerData> users;
 	private Connection mysql;
 	private MySQL mysqlc;
+	private ConfigurationHandler config;
 	
 	public PreparedStatement insert;
 	public PreparedStatement getBySUID;
@@ -29,25 +31,30 @@ public class UserHandler extends BaseHandler {
 	
 	public String userFilesPath;
 	
+	private String commonDb;
+	
 	public UserHandler(PolarPartyArea plugin) {
 		super(plugin);
 		this.users = new HashMap<String, PlayerData>();
 		
 		this.mysqlc = plugin.getMysqlconnection();
 		this.mysql = mysqlc.mysqlConn;
+		this.config = plugin.getConfigHandler();
 		
 		this.userFilesPath = plugin.getDataFolder().getAbsolutePath() + "/playerdata/";
 		File tmp = new File(this.userFilesPath);
 		if (!tmp.exists())
-			tmp.mkdirs();		
+			tmp.mkdirs();	
+		
+		this.commonDb = "`" + this.config.getCommonDatabase() + "`.";
 	}
 	
 	public void prepare() {
 		try {
-			this.getBySUID = this.mysql.prepareStatement("SELECT `mc_uid`,`nick`,`access`,`banned`,`group` FROM `users` WHERE `server_uid` = ?");
-			this.getByUUID = this.mysql.prepareStatement("SELECT `server_uid`,`nick`,`access`,`banned`,`group` FROM `users` WHERE `mc_uid` = ?");
-			this.getByName = this.mysql.prepareStatement("SELECT `server_uid`,`mc_uid`,`access`,`banned`,`group` FROM `users` WHERE `nick` = ?");
-			this.insert = this.mysql.prepareStatement("INSERT INTO `users`(`mc_uid`,`nick`)VALUES(?,?)");
+			this.getBySUID = this.mysql.prepareStatement("SELECT `mc_uid`,`nick`,`access`,`banned`,`group` FROM " + this.commonDb + "`users` WHERE `server_uid` = ?");
+			this.getByUUID = this.mysql.prepareStatement("SELECT `server_uid`,`nick`,`access`,`banned`,`group` FROM " + this.commonDb + "`users` WHERE `mc_uid` = ?");
+			this.getByName = this.mysql.prepareStatement("SELECT `server_uid`,`mc_uid`,`access`,`banned`,`group` FROM " + this.commonDb + "`users` WHERE `nick` = ?");
+			this.insert = this.mysql.prepareStatement("INSERT INTO " + this.commonDb + "`users`(`mc_uid`,`nick`)VALUES(?,?)");
 		} catch (SQLException ex) {
 			ex.printStackTrace();
 		}
@@ -191,11 +198,11 @@ public class UserHandler extends BaseHandler {
 	}
 	
 	public void updateUserDb(int userId, String column, int value) {
-		this.mysqlc.update("UPDATE `users` SET `" + column +"` = " + value + " WHERE `server_uid` = " + userId);
+		this.mysqlc.update("UPDATE " + this.commonDb + "`users` SET `" + column +"` = " + value + " WHERE `server_uid` = " + userId);
 	}
 	
 	public void updateUserDb(int userId, String column, String value) {
-		this.mysqlc.update("UPDATE `users` SET `" + column +"` = " + value + " WHERE `server_uid` = " + userId);		
+		this.mysqlc.update("UPDATE " + this.commonDb + "`users` SET `" + column +"` = " + value + " WHERE `server_uid` = " + userId);		
 	}
 	
 	public PlayerData getCacheUser(String username) {

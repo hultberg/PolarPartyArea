@@ -119,7 +119,7 @@ public class MySQL {
 	}
 	
 	public Connection connect() {
-		return connect(config.getHost(), config.getUsername(), config.getPassword(), config.getDatabase());
+		return connect(config.getHost(), config.getUsername(), config.getPassword(), config.getPluginDatabase());
 	}
 	
 	public Connection connect(String host, String username, String password,
