@@ -2,6 +2,8 @@ package net.mittnett.edvin.area.PolarPartyArea.listeners;
 
 import net.mittnett.edvin.area.PolarPartyArea.ConfigurationHandler;
 import net.mittnett.edvin.area.PolarPartyArea.PolarPartyArea;
+import net.mittnett.edvin.area.PolarPartyArea.events.PpGamePlayerKilledEvent;
+import net.mittnett.edvin.area.PolarPartyArea.events.PpGamePlayerLeaveEvent;
 import net.mittnett.edvin.area.PolarPartyArea.handlers.Broadcaster;
 import net.mittnett.edvin.area.PolarPartyArea.handlers.GameHandler;
 import net.mittnett.edvin.area.PolarPartyArea.handlers.LogHandler;
@@ -11,9 +13,11 @@ import net.mittnett.edvin.area.PolarPartyArea.handlers.UserHandler;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -76,10 +80,13 @@ public class PlayerListener implements Listener {
 		Player p = event.getPlayer();
 		event.setQuitMessage(null);
 		
-		Broadcaster.broadcastAll(this.userHandler.getPrefix(p.getName()) + ChatColor.RED + " logget av.");
+		// Call game event if ongoing
+		if (this.gameHandler.hasOngoingGame())
+			Bukkit.getPluginManager().callEvent(new PpGamePlayerLeaveEvent(p));
+		else 		
+			Broadcaster.broadcastAll(this.userHandler.getPrefix(p.getName()) + ChatColor.RED + " logget av.");
 		
 		this.userHandler.logout(p);
-		gameHandler.removePlayer(p.getName());
 	}
 	
 	@EventHandler
@@ -95,5 +102,17 @@ public class PlayerListener implements Listener {
 	@EventHandler
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		
+	}
+	
+	@EventHandler
+	public void onPlayerDeath(PlayerDeathEvent event) {
+		event.setDeathMessage(null);
+		
+		if (this.gameHandler.hasOngoingGame()) {
+			if (event.getEntityType() == EntityType.PLAYER) {
+				Player p = event.getEntity();
+				Bukkit.getPluginManager().callEvent(new PpGamePlayerKilledEvent(p, p.getKiller()));
+			}
+		}		
 	}
 }

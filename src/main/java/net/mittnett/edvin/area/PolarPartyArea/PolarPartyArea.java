@@ -17,6 +17,7 @@ import net.mittnett.edvin.area.PolarPartyArea.handlers.UserHandler;
 import net.mittnett.edvin.area.PolarPartyArea.handlers.WorldEditBridge;
 import net.mittnett.edvin.area.PolarPartyArea.listeners.BlockListener;
 import net.mittnett.edvin.area.PolarPartyArea.listeners.EntityListener;
+import net.mittnett.edvin.area.PolarPartyArea.listeners.GameListener;
 import net.mittnett.edvin.area.PolarPartyArea.listeners.PlayerListener;
 import net.mittnett.edvin.area.PolarPartyArea.sql.MySQL;
 
@@ -67,6 +68,7 @@ public class PolarPartyArea extends JavaPlugin {
 	private GameHandler gameHandler;
 	
 	/* Listeners */
+	private GameListener gameListener;
 	private PlayerListener playerListener;
 	private BlockListener blockListener;
 	private EntityListener entityListener;
@@ -108,11 +110,13 @@ public class PolarPartyArea extends JavaPlugin {
 		gameHandler.prepare();
 		
 		/* Create listeners */
+		gameListener = new GameListener(this);
 		playerListener = new PlayerListener(this);
 		blockListener = new BlockListener(this);
 		entityListener = new EntityListener(this);
 		
 		/* Enable listeners */
+		Bukkit.getPluginManager().registerEvents(gameListener, this);
 		Bukkit.getPluginManager().registerEvents(playerListener, this);
 		Bukkit.getPluginManager().registerEvents(blockListener, this);
 		Bukkit.getPluginManager().registerEvents(entityListener, this);

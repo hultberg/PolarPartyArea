@@ -5,6 +5,8 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.HashMap;
 
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import net.mittnett.edvin.area.PolarPartyArea.ConfigurationHandler;
@@ -27,6 +29,10 @@ public class GameHandler {
 	
 	/* Maps */
 	private HashMap<String, Player> players = new HashMap<String, Player>();
+	private HashMap<String, Integer> points = new HashMap<String, Integer>();
+	
+	public static int counted = 10;
+	public static int countedTask = 0;
 	
 	public GameHandler(PolarPartyArea instance)
 	{
@@ -109,16 +115,23 @@ public class GameHandler {
 	public void addPlayer(Player pl)
 	{
 		this.players.put(pl.getName(), pl);
+		this.points.put(pl.getName(), 0);
 	}
 	
 	public void removePlayer(String pl)
 	{
 		this.players.remove(pl);
+		this.points.remove(pl);
 	}
 	
 	public Player getPlayer(String pl)
 	{
 		return this.players.get(pl);
+	}
+	
+	public void addPoints(String pl, int points)
+	{
+		this.points.put(pl, (this.points.get(pl) + points));
 	}
 	
 	/**
@@ -128,6 +141,48 @@ public class GameHandler {
 	public void setStarting(boolean var1)
 	{
 		this.starting = var1;
+	}
+	
+	/**
+	 * Starts a new game
+	 * @param delay
+	 */
+	public void start(int delay)
+	{
+		if (this.hasOngoingGame()) {
+			stop();
+		}
+		
+		this.setStarting(true);
+		
+		// Schedule task for sec remaning until start
+		countedTask = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable(){
+			public void run()
+			{
+				if (counted == 0) {
+					Broadcaster.broadcastAll(ChatColor.DARK_GRAY + "> " + ChatColor.GOLD + "Spillet er igang!");
+					Bukkit.getScheduler().cancelTask(countedTask);
+					
+					// 
+					
+					return;
+				}
+				
+				Broadcaster.broadcastAll(ChatColor.DARK_GRAY + "> " + ChatColor.GOLD + "Spillet starter om " + counted + " sekund"
+						+ (counted == 1 ? "" : "er") + ", gjør deg klar!");
+				
+				counted--;
+			}
+		}, 1000, 1000);
+	}
+	
+	public void stop()
+	{
+		this.setFinished(false);
+		this.setOngoingGame(false);
+		this.setStarting(false);
+		
+		this.players.clear();
 	}
 	
 }
