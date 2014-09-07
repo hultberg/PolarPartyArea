@@ -34,6 +34,12 @@
     	<groupId>mysql</groupId>
     	<artifactId>mysql-connector-java</artifactId>
     	<version>5.1.30</version></dependency>
+    <dependency>
+    	<groupId>com.sk89q</groupId>
+    	<artifactId>WorldEdit</artifactId>
+    	<version>5.6.3</version>
+    	<scope>system</scope>
+    	<systemPath>/home/edvin/Downloads/worldedit-5.6.3.jar</systemPath></dependency>
   </dependencies>
   <repositories>
   	<repository>
