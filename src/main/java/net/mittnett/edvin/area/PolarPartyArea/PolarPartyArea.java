@@ -71,7 +71,6 @@ public class PolarPartyArea extends JavaPlugin {
 	private BlockListener blockListener;
 	private EntityListener entityListener;
 	
-	@Override
 	public void onEnable() {
 		ref = this;
 		this.getDataFolder().mkdirs();
@@ -125,7 +124,6 @@ public class PolarPartyArea extends JavaPlugin {
 		this.refreshWorld();
 	}
 	
-	@Override
 	public void onDisable() {
 		gameHandler.cleanup();
 		broadcaster.cleanup();
@@ -148,15 +146,41 @@ public class PolarPartyArea extends JavaPlugin {
 	}
 	
 	public void refreshWorld()
-	{
-		// First, get orgmap
-		World w = Bukkit.getWorld(this.config.getOrgMap());
-		if (w == null) {
-			PolarPartyArea.log.severe("MapRefreshing feature is disabled because map by the name: '" + this.config.getOrgMap() + "' was not found.");
-			return;
+	{		
+		String usingCopy = "1";
+		try {
+			usingCopy = (String) PolarPartyArea.load(new File(getDataFolder(), "lastUsed.bin"));
+		} catch (Exception e) {
+			usingCopy = "1";
 		}
 		
-		WorldCreator wc = new WorldCreator(this.config.getTempMap());
+		int using = 1;
+		try {
+			using = Integer.parseInt(usingCopy);
+		} catch (NumberFormatException e) {
+			using = 1;
+		}
+		
+		if (using > 3)
+			using = 1;
+		
+		log.info("Using world number: " + using);
+		
+		// First, get orgmap
+		World w = Bukkit.getWorld("world_pp_" + using);
+		if (w == null) {
+			WorldCreator w2 = new WorldCreator("world_pp_" + using);
+			w = w2.createWorld();
+		}
+		
+		// Save just used map.
+		try {
+			save(new File(getDataFolder(), "lastUsed.bin"), "" + (using + 1) + "");
+		} catch (Exception e) {
+			log.severe("Can't save last used map");
+		}
+		
+		WorldCreator wc = new WorldCreator("world_temp");
 		wc.copy(w);
 		wc.createWorld();
 	}
@@ -204,7 +228,7 @@ public class PolarPartyArea extends JavaPlugin {
 	}
 
 	/* Save and load functions */
-	public static void save(File binFile, Object obj) throws Exception {
+	public static void save(File binFile, Object obj) throws Exception {		
 		ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(binFile));
 		oos.writeObject(obj);
 		oos.flush();
