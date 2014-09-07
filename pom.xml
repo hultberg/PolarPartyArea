@@ -19,6 +19,12 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+    	<artifactId>craftbukkit</artifactId>
+    	<groupId>org.bukkit</groupId>
+    	<version>1.7.10-R0.1-SNAPSHOT</version>
+    	<scope>provided</scope>
+    </dependency>
+    <dependency>
     	<artifactId>bukkit</artifactId>
     	<groupId>org.bukkit</groupId>
     	<version>1.7.10-R0.1-SNAPSHOT</version>
