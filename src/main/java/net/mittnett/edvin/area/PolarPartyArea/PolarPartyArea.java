@@ -14,6 +14,7 @@ import net.mittnett.edvin.area.PolarPartyArea.handlers.Broadcaster;
 import net.mittnett.edvin.area.PolarPartyArea.handlers.GameHandler;
 import net.mittnett.edvin.area.PolarPartyArea.handlers.LogHandler;
 import net.mittnett.edvin.area.PolarPartyArea.handlers.UserHandler;
+import net.mittnett.edvin.area.PolarPartyArea.handlers.WorldEditBridge;
 import net.mittnett.edvin.area.PolarPartyArea.listeners.BlockListener;
 import net.mittnett.edvin.area.PolarPartyArea.listeners.EntityListener;
 import net.mittnett.edvin.area.PolarPartyArea.listeners.PlayerListener;
@@ -23,7 +24,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 
 public class PolarPartyArea extends JavaPlugin {
 
@@ -55,6 +60,7 @@ public class PolarPartyArea extends JavaPlugin {
 	public ConfigurationHandler config;
 	
 	/* Handlers */
+	private WorldEditBridge webridge;
 	private UserHandler userHandler;
 	private LogHandler logHandler;
 	private Broadcaster broadcaster;
@@ -87,12 +93,16 @@ public class PolarPartyArea extends JavaPlugin {
 		log.info("- Success!");
 		
 		/* Create handlers */
+		webridge = new WorldEditBridge(this);
 		userHandler = new UserHandler(this);
 		logHandler = new LogHandler(this);
 		broadcaster = new Broadcaster(this);
 		gameHandler = new GameHandler(this);
 		
 		/* Enable handlers */
+		if (!webridge.loadWe()) {
+			log.severe("WorldEdit required functions is disabled.");
+		}
 		userHandler.prepare();
 		logHandler.prepare();
 		broadcaster.prepare();
@@ -179,6 +189,18 @@ public class PolarPartyArea extends JavaPlugin {
 	public GameHandler getGameHandler()
 	{
 		return this.gameHandler;
+	}
+	
+	/**
+	 * Get WorldEditPlugin class.
+	 * @return null if WorldEdit hasn't been found.
+	 */
+	public WorldEditPlugin getWorldEdit()
+	{
+		if (this.webridge.isEnabled())
+			return this.webridge.getWorldEdit();
+		
+		return null;
 	}
 
 	/* Save and load functions */

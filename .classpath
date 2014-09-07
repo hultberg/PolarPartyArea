@@ -23,5 +23,6 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="/home/edvin/Documents/polarpartyserver/plugins/worldedit-5.6.3.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
