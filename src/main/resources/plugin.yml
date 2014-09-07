@@ -12,3 +12,7 @@ commands:
        description: Reload server config
        usage: |
               /<command>
+    game:
+       description: Game command, handle current game.
+       usage: |
+              /<command>

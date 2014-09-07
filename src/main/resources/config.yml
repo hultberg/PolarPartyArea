@@ -1,0 +1,14 @@
+# PolarParty Arena Config
+
+config:
+  default: true
+  
+# Database information
+db:
+  host: localhost
+  username: mc
+  password: m
+  database:
+    plugin: pp_area # Plugin database
+    common: pp_common # Common database, contains common user and ban table.
+    
