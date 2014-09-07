@@ -7,7 +7,7 @@ public class ConfigurationHandler {
 	private PolarPartyArea plugin;
 	private FileConfiguration config;
 	
-	private String pluginDatabase,commonDatabase,username,password,host,orgMap,tempMap;
+	private String pluginDatabase,commonDatabase,username,password,host;
 	
 	public ConfigurationHandler(PolarPartyArea instance)
 	{
@@ -25,8 +25,6 @@ public class ConfigurationHandler {
 			this.config.addDefault("db.password", "m");
 			this.config.addDefault("db.database.plugin", "pp_area");
 			this.config.addDefault("db.database.common", "pp_common");
-			this.config.addDefault("maps.orginalMapName", "world");
-			this.config.addDefault("maps.tempMap", "world_temp");
 			
 			this.config.options().copyDefaults(true);
 			plugin.saveConfig();
@@ -37,8 +35,6 @@ public class ConfigurationHandler {
 		this.password = this.config.getString("db.password");
 		this.pluginDatabase = this.config.getString("db.database.plugin");
 		this.commonDatabase = this.config.getString("db.database.common");
-		this.orgMap = this.config.getString("maps.orginalMapName");
-		this.tempMap = this.config.getString("maps.tempMap");
 	}
 
 	/**
@@ -81,12 +77,8 @@ public class ConfigurationHandler {
 		return host;
 	}
 
-	public String getOrgMap() {
-		return orgMap;
-	}
-
 	public String getTempMap() {
-		return tempMap;
+		return "world_temp";
 	}
 
 }
