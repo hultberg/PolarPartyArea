@@ -8,6 +8,7 @@ import java.io.ObjectOutputStream;
 import java.sql.SQLException;
 import java.util.logging.Logger;
 
+import net.mittnett.edvin.area.PolarPartyArea.commands.GameCommand;
 import net.mittnett.edvin.area.PolarPartyArea.commands.ReloadConfigCommand;
 import net.mittnett.edvin.area.PolarPartyArea.commands.ModCommand;
 import net.mittnett.edvin.area.PolarPartyArea.handlers.Broadcaster;
@@ -147,6 +148,7 @@ public class PolarPartyArea extends JavaPlugin {
 	public void enableCommands() {
 		getCommand("mod").setExecutor(new ModCommand(this));
 		getCommand("reloadConfig").setExecutor(new ReloadConfigCommand(this));
+		getCommand("game").setExecutor(new GameCommand(this));
 	}
 	
 	public void refreshWorld()
