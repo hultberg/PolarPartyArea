@@ -9,8 +9,8 @@ import java.sql.SQLException;
 import java.util.logging.Logger;
 
 import net.mittnett.edvin.area.PolarPartyArea.commands.GameCommand;
-import net.mittnett.edvin.area.PolarPartyArea.commands.ReloadConfigCommand;
 import net.mittnett.edvin.area.PolarPartyArea.commands.ModCommand;
+import net.mittnett.edvin.area.PolarPartyArea.commands.ReloadConfigCommand;
 import net.mittnett.edvin.area.PolarPartyArea.handlers.Broadcaster;
 import net.mittnett.edvin.area.PolarPartyArea.handlers.GameHandler;
 import net.mittnett.edvin.area.PolarPartyArea.handlers.LogHandler;
@@ -26,10 +26,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 
 public class PolarPartyArea extends JavaPlugin {

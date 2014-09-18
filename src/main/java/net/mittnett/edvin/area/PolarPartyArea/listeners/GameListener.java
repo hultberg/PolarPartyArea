@@ -27,12 +27,10 @@ public class GameListener implements Listener {
 		this.config = instance.getConfigHandler();
 	}
 	
+	@SuppressWarnings("deprecation")
 	@EventHandler
 	public void onGameStarted(PpGameStartedEvent event)
-	{
-		this.gameHandler.setStarting(false);
-		this.gameHandler.setOngoingGame(true);
-		
+	{		
 		// Teleport everybody
 		for (Player p : Bukkit.getOnlinePlayers()) {
 			p.teleport(Bukkit.getWorld(this.config.getTempMap()).getSpawnLocation());
@@ -59,6 +57,9 @@ public class GameListener implements Listener {
 		
 		// Give killer one point.
 		this.gameHandler.addPoints(killer.getName(), 1);
+
+		// Check if finished, after adding point.
+		this.gameHandler.checkIfGameFinished();
 		
 		// Broadcast death.
 		Broadcaster.broadcastAll(ChatColor.DARK_GRAY + "> "
@@ -75,6 +76,7 @@ public class GameListener implements Listener {
 		Player player = event.getPlayer();
 		
 		this.gameHandler.removePlayer(player.getName());
+		this.gameHandler.checkIfGameFinished();
 		
 		// Broadcast death.
 		Broadcaster.broadcastAll(ChatColor.DARK_GRAY + "> "

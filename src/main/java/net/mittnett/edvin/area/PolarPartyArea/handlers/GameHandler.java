@@ -5,20 +5,21 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.HashMap;
 
+import net.mittnett.edvin.area.PolarPartyArea.PolarPartyArea;
+import net.mittnett.edvin.area.PolarPartyArea.events.PpGamePlayerLeaveEvent;
+import net.mittnett.edvin.area.PolarPartyArea.events.PpGameStartedEvent;
+import net.mittnett.edvin.area.PolarPartyArea.sql.MySQL;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
-import net.mittnett.edvin.area.PolarPartyArea.ConfigurationHandler;
-import net.mittnett.edvin.area.PolarPartyArea.PolarPartyArea;
-import net.mittnett.edvin.area.PolarPartyArea.sql.MySQL;
-
 public class GameHandler {
 
 	private PolarPartyArea plugin;
-	private ConfigurationHandler config;
 	private MySQL mysqlc;
 	private Connection mysql;
+	private UserHandler userHandler;
 	
 	private PreparedStatement insertGame;
 	
@@ -26,6 +27,9 @@ public class GameHandler {
 	private boolean finished = false;
 	private boolean starting = false;
 	private boolean ongoingBattle = false;
+	
+	/* Vars */
+	private int startedGame;
 	
 	/* Maps */
 	private HashMap<String, Player> players = new HashMap<String, Player>();
@@ -37,9 +41,9 @@ public class GameHandler {
 	public GameHandler(PolarPartyArea instance)
 	{
 		this.plugin = instance;
-		this.config = instance.getConfigHandler();
 		this.mysqlc = instance.getMysqlconnection();
 		this.mysql = this.mysqlc.mysqlConn;
+		this.userHandler = instance.getUserHandler();
 	}
 	
 	public void prepare()
@@ -48,6 +52,78 @@ public class GameHandler {
 			this.insertGame = this.mysql.prepareStatement("INSERT INTO `games`('game_world', 'game_winner', 'game_started', 'game_ended')VALUES(?,?,?,?)");
 		} catch (SQLException ex) {
 			ex.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Check if game is finished by how many players left.
+	 * Call AFTER removing a player.
+	 */
+	@SuppressWarnings("deprecation")
+	public void checkIfGameFinished()
+	{
+		// Check players on the server.
+		int players = Bukkit.getOnlinePlayers().length;
+		if (players <= 1) {
+			// If under 1 (One player left)
+			this.finishGame(true);
+			return;
+		}
+	}
+	
+	/**
+	 * Will reset all variables and stop current game.
+	 * Server will be set to "waiting mode"
+	 * 
+	 * Please don't call this function on its own, use checkIfGameFinished().
+	 * 
+	 * @see checkIfGameFinished()
+	 * @param updateDb boolean Insert a record about this game in database?
+	 */
+	@SuppressWarnings("deprecation")
+	public void finishGame(boolean updateDb)
+	{
+		if (updateDb) {
+			Player[] players = Bukkit.getOnlinePlayers();
+			if (players.length > 0) {
+				Player winner = null;
+				for (Player p : players) {
+					winner = p;
+				}
+			
+				// Insert winner to database.
+				this.addGameDatabase("world_pp_", this.userHandler.getUserId(winner.getName()), winner.getName(), this.getStartedGame());
+			}
+		}		
+		
+		this.setFinished(true);
+		this.setOngoingGame(false);
+		this.setStarting(false);
+		this.setStartedGame(0);
+		this.players.clear();
+	}
+	
+	/**
+	 * Record a game to the database.
+	 * 
+	 * @param world
+	 * @param winnerID
+	 * @param winner
+	 * @param started
+	 * @return
+	 */
+	public boolean addGameDatabase(String world, int winnerID, String winner, int started)
+	{
+		try {
+			this.insertGame.setString(1, world);
+			this.insertGame.setString(2, winnerID + "|" + winner);
+			this.insertGame.setInt(3, started);
+			this.insertGame.setInt(4, (int) (System.currentTimeMillis() / 1000));
+			this.insertGame.executeUpdate();
+			return true;
+		} catch (SQLException ex) {
+			ex.printStackTrace();
+			return false;
 		}
 	}
 	
@@ -144,13 +220,26 @@ public class GameHandler {
 	}
 	
 	/**
+	 * Get timestamp of when game started.
+	 * 
+	 * @return int the timestamp
+	 */
+	public int getStartedGame() {
+		return startedGame;
+	}
+
+	public void setStartedGame(int startedGame) {
+		this.startedGame = startedGame;
+	}
+
+	/**
 	 * Starts a new game
 	 * @param delay
 	 */
 	public void start(int delay)
 	{
 		if (this.hasOngoingGame()) {
-			stop();
+			finishGame(true);
 		}
 		
 		this.setStarting(true);
@@ -163,7 +252,8 @@ public class GameHandler {
 					Broadcaster.broadcastAll(ChatColor.DARK_GRAY + "> " + ChatColor.GOLD + "Spillet er igang!");
 					Bukkit.getScheduler().cancelTask(countedTask);
 					
-					// 
+					// Start game here.
+					GameHandler.startGame();
 					
 					return;
 				}
@@ -176,13 +266,30 @@ public class GameHandler {
 		}, 1000, 1000);
 	}
 	
+	/**
+	 * Static method for starting a game.
+	 */
+	public static void startGame()
+	{
+		GameHandler game = PolarPartyArea.ref.getGameHandler();
+		game.setStarting(false);
+		game.setOngoingGame(true);
+		game.setFinished(false);
+		game.setStartedGame((int) (System.currentTimeMillis() / 1000));
+		
+		// Fire event.
+		Bukkit.getPluginManager().callEvent(new PpGameStartedEvent());
+	}
+	
+	/**
+	 * Stop game, calls finishGame(false)
+	 * 
+	 * @deprecated Use finishGame(boolean)
+	 * @see finishGame()
+	 */
 	public void stop()
 	{
-		this.setFinished(false);
-		this.setOngoingGame(false);
-		this.setStarting(false);
-		
-		this.players.clear();
+		this.finishGame(false);
 	}
 	
 }
