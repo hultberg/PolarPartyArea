@@ -1,7 +1,7 @@
 # PolarParty Arena Config
 
 config:
-  default: true
+  default: false
   
 # Database information
 db:
