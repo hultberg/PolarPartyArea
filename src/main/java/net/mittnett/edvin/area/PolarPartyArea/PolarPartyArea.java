@@ -24,6 +24,7 @@ import net.mittnett.edvin.area.PolarPartyArea.sql.MySQL;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Difficulty;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -58,6 +59,7 @@ public class PolarPartyArea extends JavaPlugin {
 	
 	/* Configuration */
 	public ConfigurationHandler config;
+	public WorldConfigurationHandler worldconfig;
 	
 	/* Handlers */
 	private WorldEditBridge webridge;
@@ -187,6 +189,20 @@ public class PolarPartyArea extends JavaPlugin {
 		WorldCreator wc = new WorldCreator("world_temp");
 		wc.copy(w);
 		wc.createWorld();
+		
+		/* Create worldconfig */
+		worldconfig = new WorldConfigurationHandler(this, w);
+		worldconfig.loadConfig();
+		
+		/* Set default world settings */
+		this.resetWorldSettings();
+	}
+	
+	public void resetWorldSettings()
+	{
+		World w = this.worldconfig.getWorld();
+		w.setDifficulty(Difficulty.NORMAL);
+		w.setPVP(true);
 	}
 
 	public Logger getLog() {
@@ -212,6 +228,11 @@ public class PolarPartyArea extends JavaPlugin {
 	public ConfigurationHandler getConfigHandler()
 	{
 		return this.config;
+	}
+	
+	public WorldConfigurationHandler getWorldConfigHandler()
+	{
+		return this.worldconfig;
 	}
 	
 	public GameHandler getGameHandler()

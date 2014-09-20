@@ -6,7 +6,6 @@ import java.sql.SQLException;
 import java.util.HashMap;
 
 import net.mittnett.edvin.area.PolarPartyArea.PolarPartyArea;
-import net.mittnett.edvin.area.PolarPartyArea.events.PpGamePlayerLeaveEvent;
 import net.mittnett.edvin.area.PolarPartyArea.events.PpGameStartedEvent;
 import net.mittnett.edvin.area.PolarPartyArea.sql.MySQL;
 
@@ -27,6 +26,7 @@ public class GameHandler {
 	private boolean finished = false;
 	private boolean starting = false;
 	private boolean ongoingBattle = false;
+	private boolean allowCompo = false;
 	
 	/* Vars */
 	private int startedGame;
@@ -95,6 +95,8 @@ public class GameHandler {
 				this.addGameDatabase("world_pp_", this.userHandler.getUserId(winner.getName()), winner.getName(), this.getStartedGame());
 			}
 		}		
+		
+		plugin.resetWorldSettings();
 		
 		this.setFinished(true);
 		this.setOngoingGame(false);
@@ -290,6 +292,18 @@ public class GameHandler {
 	public void stop()
 	{
 		this.finishGame(false);
+	}
+
+	/**
+	 * If true, allow everyone to join. If false, only admins and mods.
+	 * @return
+	 */
+	public boolean getServerAllowCompo() {
+		return allowCompo;
+	}
+
+	public void setAllowCompo(boolean allowCompo) {
+		this.allowCompo = allowCompo;
 	}
 	
 }
