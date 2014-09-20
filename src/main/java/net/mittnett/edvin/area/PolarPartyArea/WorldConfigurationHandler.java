@@ -1,6 +1,7 @@
 package net.mittnett.edvin.area.PolarPartyArea;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -28,9 +29,23 @@ public class WorldConfigurationHandler {
 	{
 		if (worldFile == null) {
 			worldFile = new File(plugin.getDataFolder(), this.world.getName() + ".yml");
-		}
+		}		
 		
 		config = YamlConfiguration.loadConfiguration(worldFile);
+		
+		if (!worldFile.exists()) {
+			this.config.addDefault("zones.deathZone.X", 0);
+			this.config.addDefault("zones.deathZone.Y", 0);
+			this.config.addDefault("zones.deathZone.Z", 0);	
+			
+			this.config.options().copyDefaults(true);
+			
+			try {
+				config.save(worldFile);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 		
 		// Load some zones.
 		this.deathPointX = this.config.getInt("zones.deathZone.X");
@@ -62,6 +77,12 @@ public class WorldConfigurationHandler {
 		this.config.set("zones.deathZone.X", loc.getBlockX());
 		this.config.set("zones.deathZone.Y", loc.getBlockY());
 		this.config.set("zones.deathZone.Z", loc.getBlockZ());
+
+		try {
+			config.save(worldFile);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		
 		this.loadConfig();
 	}

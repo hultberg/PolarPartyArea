@@ -273,7 +273,7 @@ public class GameHandler {
 	 * @param delay
 	 */
 	public void start(int delay)
-	{
+	{		
 		if (this.hasOngoingGame()) {
 			finishGame(true);
 		}
@@ -299,7 +299,19 @@ public class GameHandler {
 				
 				counted--;
 			}
-		}, 1000, 1000);
+		}, 10L, 10L);
+	}
+	
+	public int getPlayerThatCanMatch()
+	{
+		int players = 0;
+		for (Player p : Bukkit.getOnlinePlayers()) {
+			if (this.getPlayer(p.getName()) != null && this.isIgnored(p.getName()) != true) {
+				players++;
+			}
+		}
+		
+		return players;
 	}
 	
 	/**

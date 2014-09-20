@@ -13,6 +13,7 @@ import net.mittnett.edvin.area.PolarPartyArea.handlers.UserHandler;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -78,6 +79,12 @@ public class PlayerListener implements Listener {
 		p.sendMessage("Informasjon om compoen finner du på www.polarparty.no/pp23/");
 		p.sendMessage("");
 		
+		if (!this.gameHandler.hasOngoingGame()) {
+			p.setGameMode(GameMode.ADVENTURE);			
+		} else {
+			p.setGameMode(GameMode.SURVIVAL);
+		}
+		
 		this.log.log(this.userHandler.getUserId(p.getName()), null, 0, null, 0, 0, p.getAddress().getAddress().getHostAddress(), LogType.JOIN);
 		event.setJoinMessage(this.userHandler.getPrefix(p.getName()) + ChatColor.GREEN + " logget på.");
 	}
@@ -86,6 +93,8 @@ public class PlayerListener implements Listener {
 	public void onPlayerQuit(PlayerQuitEvent event) {
 		Player p = event.getPlayer();
 		event.setQuitMessage(null);
+		
+		this.log.log(this.userHandler.getUserId(p.getName()), null, 0, null, 0, 0, p.getAddress().getAddress().getHostAddress(), LogType.QUIT);
 		
 		// Call game event if ongoing
 		if (this.gameHandler.hasOngoingGame())

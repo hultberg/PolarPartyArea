@@ -12,6 +12,7 @@ import net.mittnett.edvin.area.PolarPartyArea.commands.CompoCommand;
 import net.mittnett.edvin.area.PolarPartyArea.commands.GameCommand;
 import net.mittnett.edvin.area.PolarPartyArea.commands.ModCommand;
 import net.mittnett.edvin.area.PolarPartyArea.commands.ReloadConfigCommand;
+import net.mittnett.edvin.area.PolarPartyArea.commands.WhoCommand;
 import net.mittnett.edvin.area.PolarPartyArea.handlers.Broadcaster;
 import net.mittnett.edvin.area.PolarPartyArea.handlers.GameHandler;
 import net.mittnett.edvin.area.PolarPartyArea.handlers.LogHandler;
@@ -86,6 +87,9 @@ public class PolarPartyArea extends JavaPlugin {
 		config = new ConfigurationHandler(this);		
 		config.loadConfig();
 		
+		/* Copy orgmap */
+		this.refreshWorld();
+		
 		/* Connect mysql */
 		log.info("Connecting to mysql...");
 		this.mysqlconnection = new MySQL(this);
@@ -125,9 +129,6 @@ public class PolarPartyArea extends JavaPlugin {
 		
 		/* Enable commands */
 		enableCommands();
-		
-		/* Copy orgmap */
-		this.refreshWorld();
 	}
 	
 	public void onDisable() {
@@ -151,6 +152,7 @@ public class PolarPartyArea extends JavaPlugin {
 		getCommand("reloadConfig").setExecutor(new ReloadConfigCommand(this));
 		getCommand("game").setExecutor(new GameCommand(this));
 		getCommand("compo").setExecutor(new CompoCommand(this));
+		getCommand("who").setExecutor(new WhoCommand(this));
 	}
 	
 	public void refreshWorld()

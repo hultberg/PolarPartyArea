@@ -20,3 +20,7 @@ commands:
        description: Compo command, set if allowing compo.
        usage: |
               /<command> [allow/disallow]
+    who:
+       description: Informasjon om en bruker eller deg selv.
+       usage: |
+              /<command> (brukernavn)
