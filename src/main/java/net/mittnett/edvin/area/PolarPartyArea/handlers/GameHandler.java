@@ -33,6 +33,7 @@ public class GameHandler {
 	
 	/* Maps */
 	private HashMap<String, Player> players = new HashMap<String, Player>();
+	private HashMap<String, Player> ignoreplayers = new HashMap<String, Player>();
 	private HashMap<String, Integer> points = new HashMap<String, Integer>();
 	
 	public static int counted = 10;
@@ -63,7 +64,15 @@ public class GameHandler {
 	public void checkIfGameFinished()
 	{
 		// Check players on the server.
-		int players = Bukkit.getOnlinePlayers().length;
+		int players = 0;
+		
+		// Loop players to check up with maps
+		for (Player p : Bukkit.getOnlinePlayers()) {
+			if (this.getPlayer(p.getName()) != null && this.isIgnored(p.getName()) != true) {
+				players++;
+			}
+		}
+		
 		if (players <= 1) {
 			// If under 1 (One player left)
 			this.finishGame(true);
@@ -87,8 +96,8 @@ public class GameHandler {
 			Player[] players = Bukkit.getOnlinePlayers();
 			if (players.length > 0) {
 				Player winner = null;
-				for (Player p : players) {
-					winner = p;
+				for (String p : this.getPlayersMapRaw().keySet()) {
+					winner = this.getPlayer(p);
 				}
 			
 				// Insert winner to database.
@@ -103,6 +112,7 @@ public class GameHandler {
 		this.setStarting(false);
 		this.setStartedGame(0);
 		this.players.clear();
+		this.ignoreplayers.clear();
 	}
 	
 	/**
@@ -127,6 +137,27 @@ public class GameHandler {
 			ex.printStackTrace();
 			return false;
 		}
+	}
+	
+	/**
+	 * Ignore a player for arena system.
+	 * @param p
+	 */
+	public void ignorePlayer(Player p) {
+		this.ignoreplayers.put(p.getName(), p);
+	}
+	
+	/**
+	 * Returns if p is ignored.
+	 * @param p
+	 * @return
+	 */
+	public boolean isIgnored(String p) {
+		return this.ignoreplayers.get(p) != null;
+	}
+	
+	public void removedIgnoredPlayer(String p) {
+		this.ignoreplayers.remove(p);
 	}
 	
 	public void cleanup()
@@ -200,6 +231,9 @@ public class GameHandler {
 	{
 		this.players.remove(pl);
 		this.points.remove(pl);
+		
+		if (this.isIgnored(pl))
+			this.removedIgnoredPlayer(pl);
 	}
 	
 	public Player getPlayer(String pl)

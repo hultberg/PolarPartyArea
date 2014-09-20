@@ -16,3 +16,7 @@ commands:
        description: Game command, handle current game.
        usage: |
               /<command>
+    compo:
+       description: Compo command, set if allowing compo.
+       usage: |
+              /<command> [allow/disallow]

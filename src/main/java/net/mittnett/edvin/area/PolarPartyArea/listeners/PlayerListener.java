@@ -51,6 +51,13 @@ public class PlayerListener implements Listener {
 			return;
 		}
 		
+		// Allow compo?
+		if (this.gameHandler.getServerAllowCompo() == false) {
+			if (p.isWhitelisted() == false) {
+				event.disallow(Result.KICK_WHITELIST, "Servern er ikke åpen, kun whitelista personer kan joine.");
+			}
+		}
+		
 		/* if ongoing game, and player is not in it... temp ban. */
 		if (gameHandler.hasOngoingGame() && gameHandler.getPlayer(p.getName()) == null) {
 			event.disallow(Result.KICK_BANNED, "En runde pågår og du er ikke med i den, vennligst logg inn senere.");
@@ -67,7 +74,7 @@ public class PlayerListener implements Listener {
 		
 		this.userHandler.loginUser(p);
 		
-		p.sendMessage(ChatColor.GOLD + "------------- " + ChatColor.DARK_AQUA + "POLARPARTY 23 " + ChatColor.GOLD + "-------------");
+		p.sendMessage(ChatColor.GOLD + "------------- " + ChatColor.DARK_AQUA + "POLARPARTY 23 ARENA " + ChatColor.GOLD + "-------------");
 		p.sendMessage("Informasjon om compoen finner du på www.polarparty.no/pp23/");
 		p.sendMessage("");
 		

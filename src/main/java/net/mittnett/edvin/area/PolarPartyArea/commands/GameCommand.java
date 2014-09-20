@@ -1,5 +1,6 @@
 package net.mittnett.edvin.area.PolarPartyArea.commands;
 
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -35,6 +36,16 @@ public class GameCommand extends BaseCommand {
 				gameHandler.start(10);
 			} else if (args[0].equalsIgnoreCase("stop")) {
 				gameHandler.stop();
+			} else if (args[0].equalsIgnoreCase("ignoreme")) {
+				if (this.userHandler.getAccessLevel(player) >= 5) {
+					if (this.gameHandler.isIgnored(player.getName())) {
+						this.gameHandler.removedIgnoredPlayer(player.getName());
+						player.sendMessage(ChatColor.GREEN + "Du er ikke lengre ignorert av arena systemet.");
+					} else {
+						gameHandler.ignorePlayer(player);
+						player.sendMessage(ChatColor.GREEN + "Du er nå ignorert av arena systemet.");
+					}
+				}
 			}
 		}
 		
