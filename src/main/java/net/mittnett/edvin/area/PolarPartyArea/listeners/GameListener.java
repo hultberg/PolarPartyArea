@@ -56,6 +56,8 @@ public class GameListener implements Listener {
 		w.setDifficulty(Difficulty.NORMAL);
 		w.setPVP(true);
 		
+		w.setTime(0);
+		
 		// Teleport everybody
 		for (Player p : Bukkit.getOnlinePlayers()) {
 			if (this.gameHandler.isIgnored(p.getName()) != true) {
