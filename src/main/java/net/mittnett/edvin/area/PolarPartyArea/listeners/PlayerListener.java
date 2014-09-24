@@ -2,18 +2,20 @@ package net.mittnett.edvin.area.PolarPartyArea.listeners;
 
 import net.mittnett.edvin.area.PolarPartyArea.ConfigurationHandler;
 import net.mittnett.edvin.area.PolarPartyArea.PolarPartyArea;
+import net.mittnett.edvin.area.PolarPartyArea.WorldConfigurationHandler;
 import net.mittnett.edvin.area.PolarPartyArea.events.PpGamePlayerKilledEvent;
 import net.mittnett.edvin.area.PolarPartyArea.events.PpGamePlayerLeaveEvent;
+import net.mittnett.edvin.area.PolarPartyArea.handlers.BanDataCollection;
 import net.mittnett.edvin.area.PolarPartyArea.handlers.Broadcaster;
 import net.mittnett.edvin.area.PolarPartyArea.handlers.GameHandler;
 import net.mittnett.edvin.area.PolarPartyArea.handlers.LogHandler;
 import net.mittnett.edvin.area.PolarPartyArea.handlers.LogType;
-import net.mittnett.edvin.area.PolarPartyArea.handlers.PlayerData;
 import net.mittnett.edvin.area.PolarPartyArea.handlers.UserHandler;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -25,6 +27,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 
 public class PlayerListener implements Listener {
 
@@ -33,12 +36,14 @@ public class PlayerListener implements Listener {
 	private LogHandler log;
 	private ConfigurationHandler config;
 	private GameHandler gameHandler;
+	private WorldConfigurationHandler worldconfig;
 
 	public PlayerListener(PolarPartyArea instance) {
 		this.plugin = instance;
 		this.userHandler = instance.getUserHandler();
 		this.log = instance.getLogHandler();
 		this.config = instance.getConfigHandler();
+		this.worldconfig = instance.getWorldConfigHandler();
 		this.gameHandler = instance.getGameHandler();
 	}
 	
@@ -46,10 +51,15 @@ public class PlayerListener implements Listener {
 	public void onPlayerLogin(PlayerLoginEvent event) {
 		Player p = event.getPlayer();
 		
-		PlayerData pd = this.userHandler.getPlayerData(p.getUniqueId().toString());
-		if (pd.isBanned()) {
-			event.disallow(Result.KICK_BANNED, "You have been banned from the server, no reason has been given.");
-			return;
+		BanDataCollection bdc = this.userHandler.getBanData(p.getUniqueId());
+		if (bdc.hasBan()) {
+			if (bdc.hasArenaServerBan()) {
+				event.disallow(Result.KICK_BANNED, "BANNET: " + bdc.getReason(UserHandler.SERVER_ID) + " | Kontakt game-crew for klager/spm.");
+				return;				
+			} else if (bdc.hasGlobalBan()) {
+				event.disallow(Result.KICK_BANNED, "GLOBAL-BAN: " + bdc.getGlobalBanReason() + " | Kontakt game-crew for klager/spm.");
+				return;
+			}
 		}
 		
 		// Allow compo?
@@ -60,10 +70,18 @@ public class PlayerListener implements Listener {
 		}
 		
 		/* if ongoing game, and player is not in it... temp ban. */
-		if (gameHandler.hasOngoingGame() && gameHandler.getPlayer(p.getName()) == null) {
+		if ((this.gameHandler.isStarting() || gameHandler.hasOngoingGame()) && gameHandler.getPlayer(p.getName()) == null) {
 			event.disallow(Result.KICK_BANNED, "En runde pågår og du er ikke med i den, vennligst logg inn senere.");
 			return;
 		}
+	}
+	
+	@EventHandler
+	public void onPlayerRespawn(PlayerRespawnEvent event) {		
+		event.getPlayer().setGameMode(GameMode.ADVENTURE);
+		
+		// Just change world
+		event.setRespawnLocation(Bukkit.getWorld("world_temp").getSpawnLocation());
 	}
 	
 	@EventHandler
@@ -71,16 +89,17 @@ public class PlayerListener implements Listener {
 		Player p = event.getPlayer();
 		
 		/* Send players to temp map */
-		p.teleport(Bukkit.getWorld(config.getTempMap()).getSpawnLocation());
+		p.teleport(this.worldconfig.getDeathPointLocation());
 		
 		this.userHandler.loginUser(p);
-		
-		p.sendMessage(ChatColor.GOLD + "------------- " + ChatColor.DARK_AQUA + "POLARPARTY 23 ARENA " + ChatColor.GOLD + "-------------");
+
+		p.sendMessage(ChatColor.GOLD + "---------- " + ChatColor.DARK_AQUA + "PolarParty 22...23? - LOST IN TIME " + ChatColor.GOLD + "----------");
 		p.sendMessage("Informasjon om compoen finner du på www.polarparty.no/pp23/");
 		p.sendMessage("");
 		
 		if (!this.gameHandler.hasOngoingGame()) {
-			p.setGameMode(GameMode.ADVENTURE);			
+			p.setGameMode(GameMode.ADVENTURE);	
+			p.getInventory().clear();
 		} else {
 			p.setGameMode(GameMode.SURVIVAL);
 		}

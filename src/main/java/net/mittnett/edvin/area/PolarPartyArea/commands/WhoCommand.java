@@ -46,6 +46,9 @@ public class WhoCommand extends BaseCommand {
 		if (this.userHandler.getAccessLevel(player) >= 5) {
 			player.sendMessage(ChatColor.GRAY + "BrukerID: " + ChatColor.WHITE.toString() + this.userHandler.getUserId(target));
 			player.sendMessage(ChatColor.GRAY + "Tilgang: " + ChatColor.WHITE.toString() + this.userHandler.getAccessLevel(target));
+			if (isOnline) {
+				player.sendMessage(ChatColor.GRAY + "Gamemode: " + ChatColor.WHITE.toString() + targetPl.getGameMode().toString());				
+			}
 		}
 		
 		return true;

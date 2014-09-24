@@ -9,16 +9,21 @@ import java.util.HashMap;
 import java.util.UUID;
 import java.util.logging.Level;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
-
 import net.mittnett.edvin.area.PolarPartyArea.ConfigurationHandler;
 import net.mittnett.edvin.area.PolarPartyArea.PolarPartyArea;
 import net.mittnett.edvin.area.PolarPartyArea.sql.MySQL;
 
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
+
 public class UserHandler extends BaseHandler {
 
+	public static int SERVER_ID = 2;
+	
+	private HashMap<String, String> lastMsgGot = new HashMap<String, String>();
+	private HashMap<String, String> lastMsgSent = new HashMap<String, String>();
+	
 	public HashMap<String, PlayerData> users;
 	private Connection mysql;
 	private MySQL mysqlc;
@@ -28,6 +33,9 @@ public class UserHandler extends BaseHandler {
 	public PreparedStatement getBySUID;
 	public PreparedStatement getByUUID;
 	public PreparedStatement getByName;
+	private PreparedStatement getBan;
+	private PreparedStatement setBan;
+	private PreparedStatement rmBan;
 	
 	public String userFilesPath;
 	
@@ -55,6 +63,10 @@ public class UserHandler extends BaseHandler {
 			this.getByUUID = this.mysql.prepareStatement("SELECT `server_uid`,`nick`,`access`,`banned`,`group` FROM " + this.commonDb + "`users` WHERE `mc_uid` = ?");
 			this.getByName = this.mysql.prepareStatement("SELECT `server_uid`,`mc_uid`,`access`,`banned`,`group` FROM " + this.commonDb + "`users` WHERE `nick` = ?");
 			this.insert = this.mysql.prepareStatement("INSERT INTO " + this.commonDb + "`users`(`mc_uid`,`nick`)VALUES(?,?)");
+			
+			this.getBan = this.mysql.prepareStatement("SELECT `ban_ID`,`banned`,`banner`,`timestamp`,`reason`,`from_server` FROM " + this.commonDb + "`bans` WHERE `banned`=?");
+			this.setBan = this.mysql.prepareStatement("INSERT INTO " + this.commonDb + "`bans`(`banned`,`banner`,`reason`,`from_server`,`timestamp`)VALUES(?, ?, ?, ?, ?)");
+			this.rmBan = this.mysql.prepareStatement("DELETE FROM " + this.commonDb + "`bans` WHERE `banned`=? AND `from_server`=?");
 		} catch (SQLException ex) {
 			ex.printStackTrace();
 		}
@@ -71,6 +83,10 @@ public class UserHandler extends BaseHandler {
 			this.getByUUID.close();
 			this.getByName.close();
 			this.insert.close();
+			
+			this.getBan.close();
+			this.setBan.close();
+			this.rmBan.close();
 		} catch (SQLException ex) {
 			ex.printStackTrace();
 		}
@@ -272,6 +288,39 @@ public class UserHandler extends BaseHandler {
 	}
 	
 	/**
+	 * get username
+	 * @param UUID uuid
+	 * @return boolean
+	 */
+	public int getUserId(UUID uuid) {
+		int uid = -1;
+		
+		/* For online */
+		for (String uname : this.users.keySet()) {
+			PlayerData pd = this.users.get(uname);
+			if (pd != null && pd.getMcUid() == uuid.toString()) {
+				return pd.getServerId();
+			}
+		}
+		
+		/* For offline */
+		try {
+			this.getByUUID.setString(1, uuid.toString());
+			ResultSet rs = this.getByUUID.executeQuery();
+			while (rs.next()) {
+				uid = rs.getInt(1);
+			}
+			
+			rs.close();
+		} catch (SQLException e) {
+			e.printStackTrace();			
+			return -1;
+		}
+		
+		return uid;
+	}
+	
+	/**
 	 * get uuid
 	 * @param Integer uid
 	 * @return boolean
@@ -339,6 +388,39 @@ public class UserHandler extends BaseHandler {
 		try {
 			this.getBySUID.setInt(1, uid);
 			ResultSet rs = this.getBySUID.executeQuery();
+			while (rs.next()) {
+				username = rs.getString(2);
+			}
+			
+			rs.close();
+		} catch (SQLException e) {
+			e.printStackTrace();			
+			return null;
+		}
+		
+		return username;
+	}
+	
+	/**
+	 * Get username by user UUID
+	 * @param UUID
+	 * @return boolean
+	 */
+	public String getUsername(UUID uuid) {
+		String username = null;	
+		
+		/* For online */
+		for (String uname : this.users.keySet()) {
+			PlayerData pd = this.users.get(uname);
+			if (pd.getMcUid() == uuid.toString()) {
+				return pd.getUsername();
+			}
+		}
+		
+		/* For offline */
+		try {
+			this.getByUUID.setString(1, uuid.toString());
+			ResultSet rs = this.getByUUID.executeQuery();
 			while (rs.next()) {
 				username = rs.getString(2);
 			}
@@ -484,6 +566,96 @@ public class UserHandler extends BaseHandler {
 		case 10: return ChatColor.GOLD + "[Admin] " + username;
 		default: return ChatColor.GRAY + "[Gjest] " + username;
 		}
+	}
+	
+	/* Ban API */
+	
+	/**
+	 * Provides an BanData class for user.
+	 * @param userID
+	 * @return Null if not banned.
+	 */
+	public BanDataCollection getBanData(UUID userID) {
+		
+		BanDataCollection bdc = new BanDataCollection(this.plugin);
+		bdc.setUserUUID(userID);
+		
+		try {
+			this.getBan.setString(1, userID.toString());
+			ResultSet rs = this.getBan.executeQuery();
+			
+			while(rs.next()) {
+				bdc.addBanData(new BanData(rs.getInt(1), UUID.fromString(rs.getString(2)),
+						UUID.fromString(rs.getString(3)), rs.getInt(4), rs.getString(5), rs.getInt(6)));
+			}
+			
+			if (rs != null) {
+				rs.close();
+			}
+		} catch (SQLException ex) {
+			ex.printStackTrace();
+		}
+		
+		return bdc;
+		
+	}
+	
+	public void removeBan(UUID userID, int serverID) {
+		try {
+			this.rmBan.setString(1, userID.toString());
+			this.rmBan.setInt(2, serverID);
+			this.rmBan.executeUpdate();
+		} catch (SQLException ex) {
+			ex.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Set a new ban on a user.
+	 * @param target
+	 * @param modID
+	 * @param reason
+	 * @param type 0=All servers,1=Creative only,2=Arena server only.
+	 */
+	public void setBan(UUID target, UUID modID, String reason, int type) {
+		try {
+			this.setBan.setString(1, target.toString());
+			this.setBan.setString(2, modID.toString());
+			this.setBan.setString(3, reason);
+			this.setBan.setInt(4, type);
+			this.setBan.setInt(5, (int) (System.currentTimeMillis() / 1000));
+			this.setBan.executeUpdate();
+		} catch (SQLException ex) {
+			ex.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Indicates if a user is banned, use getBanData and check if its null instead of using this function
+	 * as this function and getBanData is both used you will have sent to queries.
+	 * 
+	 * @deprecated Recommended using (getBanData(userID) != null), use this if you know what your doing.
+	 * @param userID
+	 * @return
+	 */
+	public boolean isBanned(UUID userID) {
+		return this.getBanData(userID) != null;
+	}
+	
+	public void addLastMessageSent(Player from, Player to) {
+		lastMsgSent.put(from.getName(), to.getName());
+	}
+	
+	public void addLastMessageGot(Player from, Player to) {
+		lastMsgGot.put(to.getName(), from.getName());
+	}
+	
+	public String getLastMessageSent(String uname) {
+		return lastMsgSent.get(uname);
+	}
+	
+	public String getLastMessageGot(String uname) {
+		return lastMsgGot.get(uname);
 	}
 	
 }

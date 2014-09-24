@@ -24,3 +24,30 @@ commands:
        description: Informasjon om en bruker eller deg selv.
        usage: |
               /<command> (brukernavn)
+    kick:
+       description: Kick a player.
+       usage: |
+              /<command> [username] [reason]
+    ban:
+       description: Ban a player, mode 0 requires admin access.
+       usage: |
+              /<command> [username] [mode(0/1/2)] [reason]
+    unban:
+       description: Unban a player banned on this server, will not unban global bans.
+       usage: |
+              /<command> [username]
+    msg:
+       description: Send en privat melding til en spiller.
+       aliases: [pm, m]
+       usage: |
+              /<command> [to] [message]
+    reply:
+       description: Svar til personen som sist sendte deg en melding.
+       aliases: [r]
+       usage: |
+              /<command> [message]
+    listbans:
+       description: Se ban information for user.
+       aliases: [lb,bans]
+       usage: |
+              /<command> [user]

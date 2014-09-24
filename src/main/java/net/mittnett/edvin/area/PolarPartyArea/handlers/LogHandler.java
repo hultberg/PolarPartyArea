@@ -112,6 +112,15 @@ public class LogHandler extends BaseHandler {
 				this.insertLog.setString(6, "KILL");
 				this.insertLog.executeUpdate();
 				break;
+			case KILLNATURAL:
+				this.insertLog.setInt(1, player);
+				this.insertLog.setNull(2, Types.INTEGER);
+				this.insertLog.setNull(3, Types.INTEGER);
+				this.insertLog.setNull(4, Types.SMALLINT);
+				this.insertLog.setString(5, data);
+				this.insertLog.setString(6, "KILLNATURAL");
+				this.insertLog.executeUpdate();
+				break;
 			case WIN:
 				this.insertLog.setInt(1, player);
 				this.insertLog.setNull(2, Types.INTEGER);
