@@ -144,12 +144,14 @@ public class GameListener implements Listener {
 		// Update mysql server, which a website is listening to.
 		Player player = event.getPlayer();
 		
-		this.gameHandler.removePlayer(player.getName());
-		this.gameHandler.checkIfGameFinished();
-		
-		// Broadcast death.
-		Broadcaster.broadcastAll(ChatColor.DARK_GRAY + "> "
-					+ ChatColor.RED + player.getName() + ChatColor.GOLD + " logget av og er ute!");
+		if (!event.wasKicked())
+			this.gameHandler.removePlayer(player.getName());
+			this.gameHandler.checkIfGameFinished();
+			
+			// Broadcast death.
+			Broadcaster.broadcastAll(ChatColor.DARK_GRAY + "> "
+						+ ChatColor.RED + player.getName() + ChatColor.GOLD + " logget av og er ute!");
+		}
 	}
 	
 }

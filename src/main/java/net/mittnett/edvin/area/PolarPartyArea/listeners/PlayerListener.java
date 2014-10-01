@@ -24,6 +24,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -119,11 +120,17 @@ public class PlayerListener implements Listener {
 		
 		// Call game event if ongoing
 		if (this.gameHandler.hasOngoingGame())
-			Bukkit.getPluginManager().callEvent(new PpGamePlayerLeaveEvent(p));
+			Bukkit.getPluginManager().callEvent(new PpGamePlayerLeaveEvent(p, false));
 		else 		
 			Broadcaster.broadcastAll(this.userHandler.getPrefix(p.getName()) + ChatColor.RED + " logget av.");
 		
 		this.userHandler.logout(p);
+	}
+	
+	@EventHandler
+	public void onPlayerKick(PlayerKickEvent event) {
+		Bukkit.getPluginManager().callEvent(new PpGamePlayerLeaveEvent(event.getPlayer(), true));
+		event.setLeaveMessage(null);
 	}
 	
 	@EventHandler
