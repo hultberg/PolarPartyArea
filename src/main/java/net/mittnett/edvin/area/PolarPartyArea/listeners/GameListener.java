@@ -144,7 +144,7 @@ public class GameListener implements Listener {
 		// Update mysql server, which a website is listening to.
 		Player player = event.getPlayer();
 		
-		if (!event.wasKicked())
+		if (!event.wasKicked()) {
 			this.gameHandler.removePlayer(player.getName());
 			this.gameHandler.checkIfGameFinished();
 			

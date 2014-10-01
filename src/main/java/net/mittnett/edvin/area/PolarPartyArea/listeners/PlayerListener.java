@@ -89,9 +89,6 @@ public class PlayerListener implements Listener {
 	public void onPlayerJoin(PlayerJoinEvent event) {
 		Player p = event.getPlayer();
 		
-		/* Send players to temp map */
-		p.teleport(this.worldconfig.getDeathPointLocation());
-		
 		this.userHandler.loginUser(p);
 
 		p.sendMessage(ChatColor.GOLD + "---------- " + ChatColor.DARK_AQUA + "PolarParty 22...23? - LOST IN TIME " + ChatColor.GOLD + "----------");
