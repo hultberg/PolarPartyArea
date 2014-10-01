@@ -83,7 +83,7 @@ public class GameListener implements Listener {
 				p.teleport(this.worldconfig.getDeathPointLocation());
 				p.getInventory().clear();
 				p.setGameMode(GameMode.SURVIVAL);
-				p.setHealth(20);
+				p.setHealth(20.0);
 				p.setFoodLevel(20);
 				this.gameHandler.addPlayer(p);
 			}			
@@ -102,18 +102,17 @@ public class GameListener implements Listener {
 		// Update mysql server, which a website is listening to.
 		Player killed = event.getKilledPlayer();
 		Entity killer = event.getKiller();
+		Player killerr = null;
 		
 		this.gameHandler.removePlayer(killed.getName());
 		
+		boolean boolKilled = false;
 		if (killer instanceof Player) {
-			Player killerr = (Player) killer;
+			boolKilled = true;
+			killerr = (Player) killer;
 			
 			// Kick killed
 			killed.sendMessage(ChatColor.RED + "Du ble drept av " + ChatColor.WHITE.toString() + killerr.getName() + ChatColor.RED + " og du er derfor ute av runden.");
-			
-			// Teleport player to deathpoint.
-			killed.teleport(Bukkit.getWorld("world_temp").getSpawnLocation());
-			killed.setGameMode(GameMode.ADVENTURE);
 			
 			// Give killer one point.
 			this.gameHandler.addPoints(killerr.getName(), 1);
@@ -129,6 +128,9 @@ public class GameListener implements Listener {
 						+ ChatColor.RED + killed.getName() + ChatColor.GOLD + " døde av naturlige årsaker!");		
 			this.logHandler.log(this.userHandler.getUserId(killed.getName()), "", this.userHandler.getUserId(killed.getName()), "", 0, 0, "player died natural", LogType.KILLNATURAL);		
 		}
+		
+		// Kick the player since he/she lost.
+		killed.kickPlayer("Du " + (boolKilled ? "ble drept av " + killerr.getName() : " døde av naturlige årsaker") + " og er ute, kontakt GameDesk for hjelp.");
 
 		// Check if finished, after adding point.
 		this.gameHandler.checkIfGameFinished();

@@ -37,8 +37,8 @@ public class GameCommand extends BaseCommand {
 			player.sendMessage("/game start - Start the new game counter.");
 			player.sendMessage("/game stop - Stops a game.");
 			player.sendMessage("/game ignoreMe - (Toggle) Ingore yourself in arena system.");
-			player.sendMessage("/game setspawn - Set new deathpoint");
-			player.sendMessage("/game testspawn - Test deathpoint");
+			//player.sendMessage("/game setspawn - Set new deathpoint");
+			//player.sendMessage("/game testspawn - Test deathpoint");
 		} else if (args.length >= 1) {
 			if (args[0].equalsIgnoreCase("start") && s == 10) {
 				if (this.gameHandler.getPlayerThatCanMatch() > 2) {
@@ -60,13 +60,13 @@ public class GameCommand extends BaseCommand {
 					gameHandler.ignorePlayer(player);
 					player.sendMessage(ChatColor.GREEN + "Du er nå ignorert av arena systemet.");
 				}
-			} else if (args[0].equalsIgnoreCase("setspawn") && s == 10) {
+			}/* else if (args[0].equalsIgnoreCase("setspawn") && s == 10) {
 				player.sendMessage(ChatColor.GREEN + "Setting new spawnpoint.");
 				worldconfig.setNewDeathPoint(player.getLocation());
 			} else if (args[0].equalsIgnoreCase("testspawn") && s == 10) {
 				player.sendMessage(ChatColor.GREEN + "Testing spawnpoint.");
 				player.teleport(this.worldconfig.getDeathPointLocation());
-			}
+			}*/
 		}
 		
 		return true;

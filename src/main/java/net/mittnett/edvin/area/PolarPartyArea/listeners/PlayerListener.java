@@ -100,6 +100,8 @@ public class PlayerListener implements Listener {
 		if (!this.gameHandler.hasOngoingGame()) {
 			p.setGameMode(GameMode.ADVENTURE);	
 			p.getInventory().clear();
+			p.setHealth(20.0);
+			p.setFoodLevel(20);
 		} else {
 			p.setGameMode(GameMode.SURVIVAL);
 		}
