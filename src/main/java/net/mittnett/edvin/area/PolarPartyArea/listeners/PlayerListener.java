@@ -78,14 +78,6 @@ public class PlayerListener implements Listener {
 	}
 	
 	@EventHandler
-	public void onPlayerRespawn(PlayerRespawnEvent event) {		
-		event.getPlayer().setGameMode(GameMode.ADVENTURE);
-		
-		// Just change world
-		event.setRespawnLocation(Bukkit.getWorld("world_temp").getSpawnLocation());
-	}
-	
-	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent event) {
 		Player p = event.getPlayer();
 		
@@ -103,6 +95,8 @@ public class PlayerListener implements Listener {
 		} else {
 			p.setGameMode(GameMode.SURVIVAL);
 		}
+		
+		p.teleport(Bukkit.getWorld("world_temp").getSpawnLocation());
 		
 		this.log.log(this.userHandler.getUserId(p.getName()), null, 0, null, 0, 0, p.getAddress().getAddress().getHostAddress(), LogType.JOIN);
 		event.setJoinMessage(this.userHandler.getPrefix(p.getName()) + ChatColor.GREEN + " logget på.");

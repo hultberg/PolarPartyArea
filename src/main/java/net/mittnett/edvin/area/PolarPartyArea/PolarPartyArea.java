@@ -22,6 +22,8 @@ import net.mittnett.edvin.area.PolarPartyArea.commands.MCommand;
 import net.mittnett.edvin.area.PolarPartyArea.commands.ModCommand;
 import net.mittnett.edvin.area.PolarPartyArea.commands.RCommand;
 import net.mittnett.edvin.area.PolarPartyArea.commands.ReloadConfigCommand;
+import net.mittnett.edvin.area.PolarPartyArea.commands.SpawnCommand;
+import net.mittnett.edvin.area.PolarPartyArea.commands.TpAllCommand;
 import net.mittnett.edvin.area.PolarPartyArea.commands.UnbanCommand;
 import net.mittnett.edvin.area.PolarPartyArea.commands.WhoCommand;
 import net.mittnett.edvin.area.PolarPartyArea.handlers.Broadcaster;
@@ -171,6 +173,8 @@ public class PolarPartyArea extends JavaPlugin {
 		getCommand("listbans").setExecutor(new ListBansCommand(this));
 		getCommand("ban").setExecutor(new BanCommand(this));
 		getCommand("unban").setExecutor(new UnbanCommand(this));
+		getCommand("tpall").setExecutor(new TpAllCommand(this));
+		getCommand("spawn").setExecutor(new SpawnCommand(this));
 	}
 	
 	public void refreshWorld()

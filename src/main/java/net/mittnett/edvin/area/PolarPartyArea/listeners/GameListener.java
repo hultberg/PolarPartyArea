@@ -80,7 +80,7 @@ public class GameListener implements Listener {
 		// Teleport everybody
 		for (Player p : Bukkit.getOnlinePlayers()) {
 			if (this.gameHandler.isIgnored(p.getName()) != true) {
-				p.teleport(this.worldconfig.getDeathPointLocation());
+				p.teleport(Bukkit.getWorld("world_temp").getSpawnLocation());
 				p.getInventory().clear();
 				p.setGameMode(GameMode.SURVIVAL);
 				p.setHealth(20.0);

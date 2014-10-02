@@ -51,3 +51,11 @@ commands:
        aliases: [lb,bans]
        usage: |
               /<command> [user]
+    spawn:
+       description: Goto spawn
+       usage: |
+              /<command>
+    tpall:
+       description: Teleport all to you.
+       usage: |
+              /<command>
