@@ -9,46 +9,95 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
   
-  
+    <repositories>
+        <repository>
+            <id>spigot-repo</id>
+            <url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
+        </repository>
 
-  <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-    	<artifactId>craftbukkit</artifactId>
-    	<groupId>org.bukkit</groupId>
-    	<version>1.7.10-R0.1-SNAPSHOT</version>
-    	<scope>provided</scope>
-    </dependency>
-    <dependency>
-    	<artifactId>bukkit</artifactId>
-    	<groupId>org.bukkit</groupId>
-    	<version>1.7.10-R0.1-SNAPSHOT</version>
-    	<scope>provided</scope>
-    </dependency>
-    <dependency>
-    	<groupId>mysql</groupId>
-    	<artifactId>mysql-connector-java</artifactId>
-    	<version>5.1.30</version></dependency>
-    <dependency>
-    	<groupId>com.sk89q</groupId>
-    	<artifactId>worldedit</artifactId>
-    	<version>5.6.3</version>
-    	<scope>provided</scope></dependency>
-  </dependencies>
-  <repositories>
-  	<repository>
-  		<id>bukkit-repo</id>
-  		<url>http://repo.bukkit.org/content/groups/public/</url>
-	</repository>
-  	<repository>
-  		<id>worldedit-repo</id>
-  		<url>http://maven.sk89q.com/repo/</url></repository>
-  </repositories>
+        <repository>
+            <id>sk89q-repo</id>
+            <url>http://maven.sk89q.com/repo</url>
+
+            <snapshots><checksumPolicy>ignore</checksumPolicy></snapshots>
+            <releases><checksumPolicy>ignore</checksumPolicy></releases>
+        </repository>
+    <repository>
+        <id>worldedit-repo</id>
+        <url>http://maven.sk89q.com/repo/</url></repository>
+    </repositories>
+
+    <dependencies>
+        <!--Spigot-API-->
+        <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-api</artifactId>
+            <version>1.8-R0.1-SNAPSHOT</version>
+        </dependency>
+        
+        <!--Bukkit API-->
+        <dependency>
+            <groupId>org.bukkit</groupId>
+            <artifactId>bukkit</artifactId>
+            <version>1.8-R0.1-SNAPSHOT</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20141113</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sk89q</groupId>
+            <artifactId>worldedit</artifactId>
+            <version>5.6-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <defaultGoal>clean install</defaultGoal>
+
+        <resources>
+            <resource>
+                <directory>${basedir}/src/main/resources</directory>
+                <filtering>true</filtering>
+                <targetPath>.</targetPath>
+
+                <includes>
+                    <include>plugin.yml</include>
+                </includes>
+            </resource>
+
+            <resource>
+                <directory>${basedir}/src/main/resources</directory>
+                <targetPath>.</targetPath>
+
+                <includes>
+                    <include>config.yml</include>
+                </includes>
+            </resource>
+        </resources>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
+
+                <configuration>
+                    <source>1.7</source>
+                    <target>1.7</target>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>2.1</version>
+            </plugin>
+        </plugins>
+    </build>
   <developers>
   	<developer>
   		<name>Edvin Hultberg</name>

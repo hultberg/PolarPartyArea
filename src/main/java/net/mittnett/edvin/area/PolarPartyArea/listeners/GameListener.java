@@ -8,12 +8,16 @@ import net.mittnett.edvin.area.PolarPartyArea.events.PpGamePlayerLeaveEvent;
 import net.mittnett.edvin.area.PolarPartyArea.events.PpGameStartedEvent;
 import net.mittnett.edvin.area.PolarPartyArea.handlers.Broadcaster;
 import net.mittnett.edvin.area.PolarPartyArea.handlers.GameHandler;
+import net.mittnett.edvin.area.PolarPartyArea.handlers.LogHandler;
+import net.mittnett.edvin.area.PolarPartyArea.handlers.LogType;
+import net.mittnett.edvin.area.PolarPartyArea.handlers.UserHandler;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -25,6 +29,8 @@ public class GameListener implements Listener {
 	private GameHandler gameHandler;
 	private ConfigurationHandler config;
 	private WorldConfigurationHandler worldconfig;
+	private LogHandler logHandler;
+	private UserHandler userHandler;
 
 	public GameListener(PolarPartyArea instance)
 	{
@@ -32,22 +38,32 @@ public class GameListener implements Listener {
 		this.gameHandler = instance.getGameHandler();
 		this.config = instance.getConfigHandler();
 		this.worldconfig = instance.getWorldConfigHandler();
+		this.logHandler = instance.getLogHandler();
+		this.userHandler = instance.getUserHandler();
 	}
 	
 	@EventHandler
 	public void onServerPing(ServerListPingEvent event) {
 		
 		String str = ChatColor.GREEN + "Join for å bli med!";		
-		if (this.gameHandler.hasOngoingGame()) {
-			str = ChatColor.RED + "Match pågår...";
+		if (this.gameHandler.hasOngoingGame() | this.gameHandler.isFinished()) {
+			str = ChatColor.YELLOW + "Match pågår...";
 		} else if (!this.gameHandler.getServerAllowCompo()) {
 			str = ChatColor.RED + "Server stengt";			
 		}
 		
-		event.setMotd(str);
+		event.setMotd(str + ChatColor.RESET + " - GlobeLAN 24 Arena");
+		/*try {
+			event.setServerIcon(Bukkit.loadServerIcon(new File("server.png")));
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+		} catch (UnsupportedOperationException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}*/
 	}
 	
-	@SuppressWarnings("deprecation")
 	@EventHandler
 	public void onGameStarted(PpGameStartedEvent event)
 	{		
@@ -61,8 +77,12 @@ public class GameListener implements Listener {
 		// Teleport everybody
 		for (Player p : Bukkit.getOnlinePlayers()) {
 			if (this.gameHandler.isIgnored(p.getName()) != true) {
-				p.teleport(Bukkit.getWorld(this.config.getTempMap()).getSpawnLocation());
+				p.teleport(Bukkit.getWorld("world_temp").getSpawnLocation());
+				p.getInventory().clear();
 				p.setGameMode(GameMode.SURVIVAL);
+				p.setHealth(20.0);
+				p.setFoodLevel(20);
+				this.gameHandler.addPlayer(p);
 			}			
 		}
 	}
@@ -78,27 +98,39 @@ public class GameListener implements Listener {
 		// it. Also check how many players are left.
 		// Update mysql server, which a website is listening to.
 		Player killed = event.getKilledPlayer();
-		Player killer = event.getKiller();
+		Entity killer = event.getKiller();
+		Player killerr = null;
 		
 		this.gameHandler.removePlayer(killed.getName());
 		
-		// Kick killed
-		killed.sendMessage(ChatColor.RED + "Du ble drept av " + ChatColor.WHITE.toString() + killer.getName() + ChatColor.RED + " og du er derfor ute av runden.");
+		boolean boolKilled = false;
+		if (killer instanceof Player) {
+			boolKilled = true;
+			killerr = (Player) killer;
+			
+			// Kick killed
+			killed.sendMessage(ChatColor.RED + "Du ble drept av " + ChatColor.WHITE.toString() + killerr.getName() + ChatColor.RED + " og du er derfor ute av runden.");
+			
+			// Give killer one point.
+			this.gameHandler.addPoints(killerr.getName(), 1);
+			
+			// Broadcast death.
+			Broadcaster.broadcastAll(ChatColor.DARK_GRAY + "> "
+						+ ChatColor.RED + killed.getName() + ChatColor.GOLD + " ble drept av "
+						+ ChatColor.RED + killerr.getName() + ChatColor.GOLD + "!");		
+			this.logHandler.log(this.userHandler.getUserId(killerr.getName()), "", this.userHandler.getUserId(killed.getName()), "", 0, 0, "player was killed", LogType.KILL);
+		} else {
+			// Broadcast death.
+			Broadcaster.broadcastAll(ChatColor.DARK_GRAY + "> "
+						+ ChatColor.RED + killed.getName() + ChatColor.GOLD + " døde av naturlige årsaker!");		
+			this.logHandler.log(this.userHandler.getUserId(killed.getName()), "", this.userHandler.getUserId(killed.getName()), "", 0, 0, "player died natural", LogType.KILLNATURAL);		
+		}
 		
-		// Teleport player to deathpoint.
-		killed.teleport(this.worldconfig.getDeathPointLocation());
-		killed.setGameMode(GameMode.ADVENTURE);
-		
-		// Give killer one point.
-		this.gameHandler.addPoints(killer.getName(), 1);
+		// Kick the player since he/she lost.
+		killed.kickPlayer("Du " + (boolKilled ? "ble drept av " + killerr.getName() : " døde av naturlige årsaker") + " og er ute, kontakt GameDesk for hjelp.");
 
 		// Check if finished, after adding point.
 		this.gameHandler.checkIfGameFinished();
-		
-		// Broadcast death.
-		Broadcaster.broadcastAll(ChatColor.DARK_GRAY + "> "
-					+ ChatColor.RED + killed.getName() + ChatColor.GOLD + " ble drept av "
-					+ ChatColor.RED + killer.getName() + ChatColor.GOLD + "!");
 	}
 	
 	@EventHandler
@@ -109,12 +141,14 @@ public class GameListener implements Listener {
 		// Update mysql server, which a website is listening to.
 		Player player = event.getPlayer();
 		
-		this.gameHandler.removePlayer(player.getName());
-		this.gameHandler.checkIfGameFinished();
-		
-		// Broadcast death.
-		Broadcaster.broadcastAll(ChatColor.DARK_GRAY + "> "
-					+ ChatColor.RED + player.getName() + ChatColor.GOLD + " logget av og er ute!");
+		if (!event.wasKicked()) {
+			this.gameHandler.removePlayer(player.getName());
+			this.gameHandler.checkIfGameFinished();
+			
+			// Broadcast death.
+			Broadcaster.broadcastAll(ChatColor.DARK_GRAY + "> "
+						+ ChatColor.RED + player.getName() + ChatColor.GOLD + " logget av og er ute!");
+		}
 	}
 	
 }

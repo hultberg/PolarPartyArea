@@ -9,15 +9,22 @@ public class PpGamePlayerLeaveEvent extends Event {
 	private static final HandlerList handlers = new HandlerList();
 	
 	private Player player;
+	private boolean kicked;
 	
-	public PpGamePlayerLeaveEvent(Player arg0)
+	public PpGamePlayerLeaveEvent(Player arg0, boolean kicked)
 	{
 		this.player = arg0;
+		this.kicked = kicked;
 	}
 	
 	public Player getPlayer()
 	{
 		return this.player;
+	}
+	
+	public boolean wasKicked()
+	{
+		return this.kicked;
 	}
 	 
 	public HandlerList getHandlers() {

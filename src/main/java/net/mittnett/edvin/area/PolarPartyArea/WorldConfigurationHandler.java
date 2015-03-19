@@ -3,6 +3,7 @@ package net.mittnett.edvin.area.PolarPartyArea;
 import java.io.File;
 import java.io.IOException;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -54,7 +55,7 @@ public class WorldConfigurationHandler {
 	}
 	
 	public World getWorld() {
-		return this.world;
+		return Bukkit.getWorld("world_temp");
 	}
 
 	public int getDeathPointX() {

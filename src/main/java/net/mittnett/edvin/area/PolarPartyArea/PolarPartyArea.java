@@ -3,15 +3,28 @@ package net.mittnett.edvin.area.PolarPartyArea;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.logging.Logger;
 
+import net.mittnett.edvin.area.PolarPartyArea.commands.BanCommand;
 import net.mittnett.edvin.area.PolarPartyArea.commands.CompoCommand;
 import net.mittnett.edvin.area.PolarPartyArea.commands.GameCommand;
+import net.mittnett.edvin.area.PolarPartyArea.commands.KickCommand;
+import net.mittnett.edvin.area.PolarPartyArea.commands.ListBansCommand;
+import net.mittnett.edvin.area.PolarPartyArea.commands.MCommand;
 import net.mittnett.edvin.area.PolarPartyArea.commands.ModCommand;
+import net.mittnett.edvin.area.PolarPartyArea.commands.RCommand;
 import net.mittnett.edvin.area.PolarPartyArea.commands.ReloadConfigCommand;
+import net.mittnett.edvin.area.PolarPartyArea.commands.SpawnCommand;
+import net.mittnett.edvin.area.PolarPartyArea.commands.TpAllCommand;
+import net.mittnett.edvin.area.PolarPartyArea.commands.UnbanCommand;
 import net.mittnett.edvin.area.PolarPartyArea.commands.WhoCommand;
 import net.mittnett.edvin.area.PolarPartyArea.handlers.Broadcaster;
 import net.mittnett.edvin.area.PolarPartyArea.handlers.GameHandler;
@@ -153,6 +166,15 @@ public class PolarPartyArea extends JavaPlugin {
 		getCommand("game").setExecutor(new GameCommand(this));
 		getCommand("compo").setExecutor(new CompoCommand(this));
 		getCommand("who").setExecutor(new WhoCommand(this));
+		getCommand("msg").setExecutor(new MCommand(this));
+		getCommand("reply").setExecutor(new RCommand(this));
+		getCommand("who").setExecutor(new WhoCommand(this));
+		getCommand("kick").setExecutor(new KickCommand(this));
+		getCommand("listbans").setExecutor(new ListBansCommand(this));
+		getCommand("ban").setExecutor(new BanCommand(this));
+		getCommand("unban").setExecutor(new UnbanCommand(this));
+		getCommand("tpall").setExecutor(new TpAllCommand(this));
+		getCommand("spawn").setExecutor(new SpawnCommand(this));
 	}
 	
 	public void refreshWorld()
@@ -190,9 +212,16 @@ public class PolarPartyArea extends JavaPlugin {
 			log.severe("Can't save last used map");
 		}
 		
-		WorldCreator wc = new WorldCreator("world_temp");
-		wc.copy(w);
-		wc.createWorld();
+		// The world to copy
+		File sourceFolder = w.getWorldFolder();
+		 
+		// The world to overwrite when copying		
+		File targetFolder = new File("world_temp");		
+		this.copyWorld(sourceFolder, targetFolder);
+		
+		// Load world_temp
+		WorldCreator temp = new WorldCreator("world_temp");
+		temp.createWorld();
 		
 		/* Create worldconfig */
 		worldconfig = new WorldConfigurationHandler(this, w);
@@ -271,4 +300,34 @@ public class PolarPartyArea extends JavaPlugin {
 		return result;
 	}
 	
+	public void copyWorld(File source, File target) {
+		try {
+			ArrayList<String> ignore = new ArrayList<String>(Arrays.asList(
+					"uid.dat", "session.dat"));
+			if (!ignore.contains(source.getName())) {
+				if (source.isDirectory()) {
+					if (!target.exists())
+						target.mkdirs();
+					String files[] = source.list();
+					for (String file : files) {
+						File srcFile = new File(source, file);
+						File destFile = new File(target, file);
+						copyWorld(srcFile, destFile);
+					}
+				} else {
+					InputStream in = new FileInputStream(source);
+					OutputStream out = new FileOutputStream(target);
+					byte[] buffer = new byte[1024];
+					int length;
+					while ((length = in.read(buffer)) > 0)
+						out.write(buffer, 0, length);
+					in.close();
+					out.close();
+				}
+			}
+		} catch (IOException e) {
+
+		}
+	}
+
 }

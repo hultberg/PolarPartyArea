@@ -2,6 +2,7 @@ package net.mittnett.edvin.area.PolarPartyArea.listeners;
 
 import net.mittnett.edvin.area.PolarPartyArea.PolarPartyArea;
 
+import org.bukkit.GameMode;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -18,12 +19,18 @@ public class BlockListener implements Listener {
 	
 	@EventHandler
 	public void onBlockPlace(BlockPlaceEvent event) {
-		
+		if (event.getPlayer().getGameMode() == GameMode.ADVENTURE) {
+			event.setCancelled(true);
+			return;
+		}
 	}
 	
 	@EventHandler
 	public void onBlockBreak(BlockBreakEvent event) {		
-		
+		if (event.getPlayer().getGameMode() == GameMode.ADVENTURE) {
+			event.setCancelled(true);
+			return;
+		}
 	}
 	
 }

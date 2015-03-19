@@ -36,7 +36,7 @@ public class GameHandler {
 	private HashMap<String, Player> ignoreplayers = new HashMap<String, Player>();
 	private HashMap<String, Integer> points = new HashMap<String, Integer>();
 	
-	public static int counted = 10;
+	public static int counted = 20;
 	public static int countedTask = 0;
 	
 	public GameHandler(PolarPartyArea instance)
@@ -50,7 +50,16 @@ public class GameHandler {
 	public void prepare()
 	{
 		try {
-			this.insertGame = this.mysql.prepareStatement("INSERT INTO `games`('game_world', 'game_winner', 'game_started', 'game_ended')VALUES(?,?,?,?)");
+			this.insertGame = this.mysql.prepareStatement("INSERT INTO `games`(`game_world`, `game_winner`, `game_started`, `game_ended`)VALUES(?,?,?,?)");
+		} catch (SQLException ex) {
+			ex.printStackTrace();
+		}
+	}
+	
+	public void cleanup()
+	{
+		try {
+			this.insertGame.close();
 		} catch (SQLException ex) {
 			ex.printStackTrace();
 		}
@@ -60,7 +69,6 @@ public class GameHandler {
 	 * Check if game is finished by how many players left.
 	 * Call AFTER removing a player.
 	 */
-	@SuppressWarnings("deprecation")
 	public void checkIfGameFinished()
 	{
 		// Check players on the server.
@@ -89,19 +97,29 @@ public class GameHandler {
 	 * @see checkIfGameFinished()
 	 * @param updateDb boolean Insert a record about this game in database?
 	 */
-	@SuppressWarnings("deprecation")
 	public void finishGame(boolean updateDb)
 	{
 		if (updateDb) {
-			Player[] players = Bukkit.getOnlinePlayers();
-			if (players.length > 0) {
+			HashMap<String, Player> players = this.getPlayersMapRaw();
+			if (players.size() == 1) {
 				Player winner = null;
 				for (String p : this.getPlayersMapRaw().keySet()) {
 					winner = this.getPlayer(p);
+					if (winner == null) {
+						System.out.println("ERROR... Winner is null.");
+						return;
+					}
 				}
 			
 				// Insert winner to database.
 				this.addGameDatabase("world_pp_", this.userHandler.getUserId(winner.getName()), winner.getName(), this.getStartedGame());
+
+				// Broadcast winner.
+				Broadcaster.broadcastAll(ChatColor.DARK_GRAY + "> "
+							+ ChatColor.RED + winner.getName() + ChatColor.GOLD + " vant matchen!");
+			} else {
+				System.out.println("ERROR... More players left!!!");
+				return;
 			}
 		}		
 		
@@ -158,15 +176,6 @@ public class GameHandler {
 	
 	public void removedIgnoredPlayer(String p) {
 		this.ignoreplayers.remove(p);
-	}
-	
-	public void cleanup()
-	{
-		try {
-			this.insertGame.close();
-		} catch (SQLException ex) {
-			ex.printStackTrace();
-		}
 	}
 	
 	/**
@@ -243,7 +252,12 @@ public class GameHandler {
 	
 	public void addPoints(String pl, int points)
 	{
-		this.points.put(pl, (this.points.get(pl) + points));
+		int has = 0;
+		if (this.points.get(pl) != null) {
+			has = this.points.get(pl);
+		}
+		
+		this.points.put(pl, (has + points));
 	}
 	
 	/**
@@ -299,7 +313,7 @@ public class GameHandler {
 				
 				counted--;
 			}
-		}, 10L, 10L);
+		}, 20L, 20L);
 	}
 	
 	public int getPlayerThatCanMatch()
@@ -332,7 +346,6 @@ public class GameHandler {
 	/**
 	 * Stop game, calls finishGame(false)
 	 * 
-	 * @deprecated Use finishGame(boolean)
 	 * @see finishGame()
 	 */
 	public void stop()
