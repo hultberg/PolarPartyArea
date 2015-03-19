@@ -1,5 +1,6 @@
 package net.mittnett.edvin.area.PolarPartyArea.commands;
 
+import java.util.Collection;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -28,8 +29,8 @@ public class WhoCommand extends BaseCommand {
 		
 		if (args.length == 0) {
 			// List of online users.
-			
-			Player[] ps = Bukkit.getOnlinePlayers();
+
+            Collection<? extends Player> ps = this.plugin.getServer().getOnlinePlayers();
 			StringBuilder sb = new StringBuilder();
 			for (Player p : ps) {
 				switch (this.userHandler.getAccessLevel(p)) {
@@ -53,7 +54,7 @@ public class WhoCommand extends BaseCommand {
 			String players = sb.toString();
 			players = players.substring(0, (players.length() - 2)) + ".";
 			
-			player.sendMessage(ChatColor.GREEN + "Spillere pålogget (" + ps.length + "): " + ChatColor.RESET + players);
+			player.sendMessage(ChatColor.GREEN + "Spillere pålogget (" + ps.size() + "): " + ChatColor.RESET + players);
 		} else {
 			// Try to find target.
 			String target = args[0];

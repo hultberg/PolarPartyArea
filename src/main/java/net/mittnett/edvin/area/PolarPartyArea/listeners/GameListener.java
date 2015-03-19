@@ -1,7 +1,5 @@
 package net.mittnett.edvin.area.PolarPartyArea.listeners;
 
-import java.io.File;
-
 import net.mittnett.edvin.area.PolarPartyArea.ConfigurationHandler;
 import net.mittnett.edvin.area.PolarPartyArea.PolarPartyArea;
 import net.mittnett.edvin.area.PolarPartyArea.WorldConfigurationHandler;
@@ -54,8 +52,8 @@ public class GameListener implements Listener {
 			str = ChatColor.RED + "Server stengt";			
 		}
 		
-		event.setMotd(str + ChatColor.RESET + " - PolarParty 23 Arena");
-		try {
+		event.setMotd(str + ChatColor.RESET + " - GlobeLAN 24 Arena");
+		/*try {
 			event.setServerIcon(Bukkit.loadServerIcon(new File("server.png")));
 		} catch (IllegalArgumentException e) {
 			e.printStackTrace();
@@ -63,10 +61,9 @@ public class GameListener implements Listener {
 			e.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();
-		}
+		}*/
 	}
 	
-	@SuppressWarnings("deprecation")
 	@EventHandler
 	public void onGameStarted(PpGameStartedEvent event)
 	{		
@@ -121,7 +118,7 @@ public class GameListener implements Listener {
 			Broadcaster.broadcastAll(ChatColor.DARK_GRAY + "> "
 						+ ChatColor.RED + killed.getName() + ChatColor.GOLD + " ble drept av "
 						+ ChatColor.RED + killerr.getName() + ChatColor.GOLD + "!");		
-			this.logHandler.log(this.userHandler.getUserId(killerr.getName()), "", this.userHandler.getUserId(killed.getName()), "", 0, 0, "player drepte killed", LogType.KILL);
+			this.logHandler.log(this.userHandler.getUserId(killerr.getName()), "", this.userHandler.getUserId(killed.getName()), "", 0, 0, "player was killed", LogType.KILL);
 		} else {
 			// Broadcast death.
 			Broadcaster.broadcastAll(ChatColor.DARK_GRAY + "> "

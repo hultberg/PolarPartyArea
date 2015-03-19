@@ -69,7 +69,6 @@ public class GameHandler {
 	 * Check if game is finished by how many players left.
 	 * Call AFTER removing a player.
 	 */
-	@SuppressWarnings("deprecation")
 	public void checkIfGameFinished()
 	{
 		// Check players on the server.
@@ -347,7 +346,6 @@ public class GameHandler {
 	/**
 	 * Stop game, calls finishGame(false)
 	 * 
-	 * @deprecated Use finishGame(boolean)
 	 * @see finishGame()
 	 */
 	public void stop()

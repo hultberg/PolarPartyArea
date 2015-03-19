@@ -83,8 +83,8 @@ public class PlayerListener implements Listener {
 		
 		this.userHandler.loginUser(p);
 
-		p.sendMessage(ChatColor.GOLD + "---------- " + ChatColor.DARK_AQUA + "PolarParty 22...23? - LOST IN TIME " + ChatColor.GOLD + "----------");
-		p.sendMessage("Informasjon om compoen finner du på www.polarparty.no/pp23/");
+		p.sendMessage(ChatColor.GOLD + "---------- " + ChatColor.DARK_AQUA + "GlobeLAN 24 " + ChatColor.GOLD + "----------");
+		p.sendMessage("Gå til Gamedesk for hjelp eller spørsmål");
 		p.sendMessage("");
 		
 		if (!this.gameHandler.hasOngoingGame()) {
