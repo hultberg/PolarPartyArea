@@ -53,7 +53,7 @@ public class GameListener implements Listener {
 		}
 		
 		event.setMotd(str + ChatColor.RESET + " - PolarParty 24 Arena");
-		/*try {
+		try {
 			event.setServerIcon(Bukkit.loadServerIcon(new File("server.png")));
 		} catch (IllegalArgumentException e) {
 			e.printStackTrace();
@@ -61,7 +61,7 @@ public class GameListener implements Listener {
 			e.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();
-		}*/
+		}
 	}
 	
 	@EventHandler
