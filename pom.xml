@@ -65,7 +65,14 @@
 
                 <includes>
                     <include>plugin.yml</include>
-		    <include>config.yml</include>
+					<include>config.yml</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>${basedir}/</directory>
+                <targetPath>.</targetPath>
+
+                <includes>
                     <include>server.png</include>
                 </includes>
             </resource>
