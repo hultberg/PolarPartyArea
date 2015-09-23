@@ -83,8 +83,8 @@ public class PlayerListener implements Listener {
 		
 		this.userHandler.loginUser(p);
 
-		p.sendMessage(ChatColor.GOLD + "---------- " + ChatColor.DARK_AQUA + "GlobeLAN 24 " + ChatColor.GOLD + "----------");
-		p.sendMessage("Gå til Gamedesk for hjelp eller spørsmål");
+		p.sendMessage(ChatColor.GOLD + "---------- " + ChatColor.DARK_AQUA + "PolarParty 24 " + ChatColor.GOLD + "----------");
+		p.sendMessage("Gå til Superdesk for hjelp eller spørsmål");
 		p.sendMessage("");
 		
 		if (!this.gameHandler.hasOngoingGame()) {

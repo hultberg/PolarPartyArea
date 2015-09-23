@@ -52,7 +52,7 @@ public class GameListener implements Listener {
 			str = ChatColor.RED + "Server stengt";			
 		}
 		
-		event.setMotd(str + ChatColor.RESET + " - GlobeLAN 24 Arena");
+		event.setMotd(str + ChatColor.RESET + " - PolarParty 24 Arena");
 		/*try {
 			event.setServerIcon(Bukkit.loadServerIcon(new File("server.png")));
 		} catch (IllegalArgumentException e) {
