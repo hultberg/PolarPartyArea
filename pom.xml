@@ -61,22 +61,15 @@
         <resources>
             <resource>
                 <directory>${basedir}/src/main/resources</directory>
-                <filtering>true</filtering>
                 <targetPath>.</targetPath>
 
                 <includes>
                     <include>plugin.yml</include>
+		    <include>config.yml</include>
+                    <include>server.png</server>
                 </includes>
             </resource>
 
-            <resource>
-                <directory>${basedir}/src/main/resources</directory>
-                <targetPath>.</targetPath>
-
-                <includes>
-                    <include>config.yml</include>
-                </includes>
-            </resource>
         </resources>
 
         <plugins>
