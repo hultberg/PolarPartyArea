@@ -16,7 +16,7 @@ public class WorldConfigurationHandler {
 	private File worldFile = null;
 	private World world = null;
 	
-	private int deathPointX,deathPointY,deathPointZ;
+	private int spectPointX,spectPointY,spectPointZ;
 	
 	public WorldConfigurationHandler(PolarPartyArea instance, World w)
 	{
@@ -35,9 +35,9 @@ public class WorldConfigurationHandler {
 		config = YamlConfiguration.loadConfiguration(worldFile);
 		
 		if (!worldFile.exists()) {
-			this.config.addDefault("zones.deathZone.X", 0);
-			this.config.addDefault("zones.deathZone.Y", 0);
-			this.config.addDefault("zones.deathZone.Z", 0);	
+			this.config.addDefault("zones.spectZone.X", 0);
+			this.config.addDefault("zones.spectZone.Y", 128);
+			this.config.addDefault("zones.spectZone.Z", 0);	
 			
 			this.config.options().copyDefaults(true);
 			
@@ -49,35 +49,35 @@ public class WorldConfigurationHandler {
 		}
 		
 		// Load some zones.
-		this.deathPointX = this.config.getInt("zones.deathZone.X");
-		this.deathPointY = this.config.getInt("zones.deathZone.Y");
-		this.deathPointZ = this.config.getInt("zones.deathZone.Z");
+		this.spectPointX = this.config.getInt("zones.spectZone.X");
+		this.spectPointY = this.config.getInt("zones.spectZone.Y");
+		this.spectPointZ = this.config.getInt("zones.spectZone.Z");
 	}
 	
 	public World getWorld() {
 		return Bukkit.getWorld("world_temp");
 	}
 
-	public int getDeathPointX() {
-		return deathPointX;
+	public int getSpectatePointX() {
+		return this.spectPointX;
 	}
 
-	public int getDeathPointY() {
-		return deathPointY;
+	public int getSpectatePointY() {
+		return this.spectPointY;
 	}
 
-	public int getDeathPointZ() {
-		return deathPointZ;
+	public int getSpectatePointZ() {
+		return this.spectPointZ;
 	}
 	
-	public Location getDeathPointLocation() {
-		return new Location(this.getWorld(), this.getDeathPointX(), this.getDeathPointY(), this.getDeathPointZ());
+	public Location getSpectateSpawnPoint() {
+		return new Location(this.getWorld(), this.getSpectatePointX(), this.getSpectatePointY(), this.getSpectatePointZ());
 	}
 	
-	public void setNewDeathPoint(Location loc) {
-		this.config.set("zones.deathZone.X", loc.getBlockX());
-		this.config.set("zones.deathZone.Y", loc.getBlockY());
-		this.config.set("zones.deathZone.Z", loc.getBlockZ());
+	public void setSpectateSpawnPoint(Location loc) {
+		this.config.set("zones.spectZone.X", loc.getBlockX());
+		this.config.set("zones.spectZone.Y", loc.getBlockY());
+		this.config.set("zones.spectZone.Z", loc.getBlockZ());
 
 		try {
 			config.save(worldFile);

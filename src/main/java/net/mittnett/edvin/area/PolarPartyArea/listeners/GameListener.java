@@ -2,18 +2,6 @@ package net.mittnett.edvin.area.PolarPartyArea.listeners;
 
 import java.io.File;
 
-import net.mittnett.edvin.area.PolarPartyArea.ConfigurationHandler;
-import net.mittnett.edvin.area.PolarPartyArea.PolarPartyArea;
-import net.mittnett.edvin.area.PolarPartyArea.WorldConfigurationHandler;
-import net.mittnett.edvin.area.PolarPartyArea.events.PpGamePlayerKilledEvent;
-import net.mittnett.edvin.area.PolarPartyArea.events.PpGamePlayerLeaveEvent;
-import net.mittnett.edvin.area.PolarPartyArea.events.PpGameStartedEvent;
-import net.mittnett.edvin.area.PolarPartyArea.handlers.Broadcaster;
-import net.mittnett.edvin.area.PolarPartyArea.handlers.GameHandler;
-import net.mittnett.edvin.area.PolarPartyArea.handlers.LogHandler;
-import net.mittnett.edvin.area.PolarPartyArea.handlers.LogType;
-import net.mittnett.edvin.area.PolarPartyArea.handlers.UserHandler;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Difficulty;
@@ -25,11 +13,21 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.server.ServerListPingEvent;
 
+import net.mittnett.edvin.area.PolarPartyArea.PolarPartyArea;
+import net.mittnett.edvin.area.PolarPartyArea.WorldConfigurationHandler;
+import net.mittnett.edvin.area.PolarPartyArea.events.PpGamePlayerKilledEvent;
+import net.mittnett.edvin.area.PolarPartyArea.events.PpGamePlayerLeaveEvent;
+import net.mittnett.edvin.area.PolarPartyArea.events.PpGameStartedEvent;
+import net.mittnett.edvin.area.PolarPartyArea.handlers.Broadcaster;
+import net.mittnett.edvin.area.PolarPartyArea.handlers.GameHandler;
+import net.mittnett.edvin.area.PolarPartyArea.handlers.LogHandler;
+import net.mittnett.edvin.area.PolarPartyArea.handlers.LogType;
+import net.mittnett.edvin.area.PolarPartyArea.handlers.UserHandler;
+
 public class GameListener implements Listener {
 	
 	private PolarPartyArea plugin;
 	private GameHandler gameHandler;
-	private ConfigurationHandler config;
 	private WorldConfigurationHandler worldconfig;
 	private LogHandler logHandler;
 	private UserHandler userHandler;
@@ -38,7 +36,6 @@ public class GameListener implements Listener {
 	{
 		this.plugin = instance;
 		this.gameHandler = instance.getGameHandler();
-		this.config = instance.getConfigHandler();
 		this.worldconfig = instance.getWorldConfigHandler();
 		this.logHandler = instance.getLogHandler();
 		this.userHandler = instance.getUserHandler();
@@ -129,7 +126,8 @@ public class GameListener implements Listener {
 		}
 		
 		// Kick the player since he/she lost.
-		killed.kickPlayer("Du " + (boolKilled ? "ble drept av " + killerr.getName() : " døde av naturlige årsaker") + " og er ute, kontakt GameDesk for hjelp.");
+		plugin.setPlayerSpectator(killed);
+		killed.sendMessage("Du " + (boolKilled ? "ble drept av " + killerr.getName() : " døde av naturlige årsaker") + " og er ute, kontakt GameDesk for hjelp.");
 
 		// Check if finished, after adding point.
 		this.gameHandler.checkIfGameFinished();

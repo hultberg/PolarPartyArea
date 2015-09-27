@@ -22,7 +22,6 @@ public class WhoCommand extends BaseCommand {
 		this.setPlayerCommand(true);
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public boolean onPlayerCommand(Player player, CommandSender sender,
 			Command command, String label, String[] args) {

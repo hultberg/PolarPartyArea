@@ -40,8 +40,10 @@ import net.mittnett.edvin.area.PolarPartyArea.sql.MySQL;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Difficulty;
+import org.bukkit.GameMode;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
@@ -328,6 +330,16 @@ public class PolarPartyArea extends JavaPlugin {
 		} catch (IOException e) {
 
 		}
+	}
+	
+	/**
+	 * A method that will set the player as a spectator and teleports the player to the spectator area
+	 * Will also clear inventory and set health
+	 */
+	public void setPlayerSpectator(Player player)
+	{
+		player.setGameMode(GameMode.ADVENTURE);
+		player.getInventory().clear();
 	}
 
 }

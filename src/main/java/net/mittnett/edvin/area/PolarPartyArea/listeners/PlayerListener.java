@@ -1,21 +1,8 @@
 package net.mittnett.edvin.area.PolarPartyArea.listeners;
 
-import net.mittnett.edvin.area.PolarPartyArea.ConfigurationHandler;
-import net.mittnett.edvin.area.PolarPartyArea.PolarPartyArea;
-import net.mittnett.edvin.area.PolarPartyArea.WorldConfigurationHandler;
-import net.mittnett.edvin.area.PolarPartyArea.events.PpGamePlayerKilledEvent;
-import net.mittnett.edvin.area.PolarPartyArea.events.PpGamePlayerLeaveEvent;
-import net.mittnett.edvin.area.PolarPartyArea.handlers.BanDataCollection;
-import net.mittnett.edvin.area.PolarPartyArea.handlers.Broadcaster;
-import net.mittnett.edvin.area.PolarPartyArea.handlers.GameHandler;
-import net.mittnett.edvin.area.PolarPartyArea.handlers.LogHandler;
-import net.mittnett.edvin.area.PolarPartyArea.handlers.LogType;
-import net.mittnett.edvin.area.PolarPartyArea.handlers.UserHandler;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
-import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -28,23 +15,28 @@ import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
+
+import net.mittnett.edvin.area.PolarPartyArea.PolarPartyArea;
+import net.mittnett.edvin.area.PolarPartyArea.events.PpGamePlayerKilledEvent;
+import net.mittnett.edvin.area.PolarPartyArea.events.PpGamePlayerLeaveEvent;
+import net.mittnett.edvin.area.PolarPartyArea.handlers.BanDataCollection;
+import net.mittnett.edvin.area.PolarPartyArea.handlers.Broadcaster;
+import net.mittnett.edvin.area.PolarPartyArea.handlers.GameHandler;
+import net.mittnett.edvin.area.PolarPartyArea.handlers.LogHandler;
+import net.mittnett.edvin.area.PolarPartyArea.handlers.LogType;
+import net.mittnett.edvin.area.PolarPartyArea.handlers.UserHandler;
 
 public class PlayerListener implements Listener {
 
 	private PolarPartyArea plugin;
 	private UserHandler userHandler;
 	private LogHandler log;
-	private ConfigurationHandler config;
 	private GameHandler gameHandler;
-	private WorldConfigurationHandler worldconfig;
 
 	public PlayerListener(PolarPartyArea instance) {
 		this.plugin = instance;
 		this.userHandler = instance.getUserHandler();
 		this.log = instance.getLogHandler();
-		this.config = instance.getConfigHandler();
-		this.worldconfig = instance.getWorldConfigHandler();
 		this.gameHandler = instance.getGameHandler();
 	}
 	
@@ -88,15 +80,12 @@ public class PlayerListener implements Listener {
 		p.sendMessage("");
 		
 		if (!this.gameHandler.hasOngoingGame()) {
-			p.setGameMode(GameMode.ADVENTURE);	
-			p.getInventory().clear();
-			p.setHealth(20.0);
-			p.setFoodLevel(20);
+			plugin.setPlayerSpectator(p);
 		} else {
 			p.setGameMode(GameMode.SURVIVAL);
 		}
 		
-		p.teleport(Bukkit.getWorld("world_temp").getSpawnLocation());
+		p.teleport(plugin.getWorldConfigHandler().getSpectateSpawnPoint());
 		
 		this.log.log(this.userHandler.getUserId(p.getName()), null, 0, null, 0, 0, p.getAddress().getAddress().getHostAddress(), LogType.JOIN);
 		event.setJoinMessage(this.userHandler.getPrefix(p.getName()) + ChatColor.GREEN + " logget på.");

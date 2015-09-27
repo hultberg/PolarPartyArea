@@ -238,11 +238,11 @@ public class UserHandler extends BaseHandler {
 			ResultSet rs = this.getByUUID.executeQuery();
 			while (rs.next()) {
 				pd.setMcUid(mcuid);
-				pd.setServerId(rs.getInt(1));
-				pd.setUsername(rs.getString(2));
-				pd.setAccess(rs.getInt(3));
-				pd.setBanned(rs.getInt(4) == 1);
-				pd.setGroupId(rs.getInt(5));
+				pd.setServerId(rs.getInt("server_uid"));
+				pd.setUsername(rs.getString("nick"));
+				pd.setAccess(rs.getInt("access"));
+				pd.setBanned(rs.getInt("banned") == 1);
+				pd.setGroupId(rs.getInt("group"));
 			}
 			
 			rs.close();

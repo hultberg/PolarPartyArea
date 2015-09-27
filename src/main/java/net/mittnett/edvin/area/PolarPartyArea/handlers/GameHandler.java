@@ -3,6 +3,7 @@ package net.mittnett.edvin.area.PolarPartyArea.handlers;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.HashMap;
 
 import net.mittnett.edvin.area.PolarPartyArea.PolarPartyArea;
@@ -117,6 +118,9 @@ public class GameHandler {
 				// Broadcast winner.
 				Broadcaster.broadcastAll(ChatColor.DARK_GRAY + "> "
 							+ ChatColor.RED + winner.getName() + ChatColor.GOLD + " vant matchen!");
+				
+				// Teleport winner to bed location
+				winner.teleport(this.plugin.worldconfig.getSpectateSpawnPoint());
 			} else {
 				System.out.println("ERROR... More players left!!!");
 				return;
@@ -294,6 +298,8 @@ public class GameHandler {
 		
 		this.setStarting(true);
 		
+		this.setSpectatePointOnPlayers();
+		
 		// Schedule task for sec remaning until start
 		countedTask = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable(){
 			public void run()
@@ -363,6 +369,17 @@ public class GameHandler {
 
 	public void setAllowCompo(boolean allowCompo) {
 		this.allowCompo = allowCompo;
+	}
+	
+	public void setSpectatePointOnPlayers()
+	{
+		Collection<? extends Player> pls = Bukkit.getOnlinePlayers();
+		if (pls.size() > 0) {
+			for (Player p : pls) {
+				if (!this.isIgnored(p.getName()))
+					p.setBedSpawnLocation(this.plugin.getWorldConfigHandler().getSpectateSpawnPoint(), true);
+			}
+		}
 	}
 	
 }

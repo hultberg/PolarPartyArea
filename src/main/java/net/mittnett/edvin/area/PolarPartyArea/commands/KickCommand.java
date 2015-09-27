@@ -25,7 +25,6 @@ public class KickCommand extends BaseCommand {
 		this.logHandler = plugin.getLogHandler();
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public boolean onPlayerCommand(Player player, CommandSender sender,
 			Command command, String label, String[] args) {

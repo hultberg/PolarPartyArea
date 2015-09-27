@@ -19,7 +19,6 @@ public class MCommand extends BaseCommand {
 	}
 
 	@Override
-	@SuppressWarnings("deprecation")
 	public boolean onPlayerCommand(Player player, CommandSender sender,
 			Command command, String label, String[] args) {
 		

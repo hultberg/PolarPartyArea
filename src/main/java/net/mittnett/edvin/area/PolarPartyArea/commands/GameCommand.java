@@ -12,7 +12,6 @@ import net.mittnett.edvin.area.PolarPartyArea.handlers.GameHandler;
 
 public class GameCommand extends BaseCommand {
 
-	private PolarPartyArea plugin;
 	private GameHandler gameHandler;
 	private WorldConfigurationHandler worldconfig;
 	
@@ -21,7 +20,6 @@ public class GameCommand extends BaseCommand {
 		this.setAccessLevel(5);
 		this.setPlayerCommand(true);
 		
-		this.plugin = instance;
 		this.gameHandler = instance.getGameHandler();
 		this.worldconfig = instance.getWorldConfigHandler();
 	}
@@ -37,8 +35,8 @@ public class GameCommand extends BaseCommand {
 			player.sendMessage("/game start - Start the new game counter.");
 			player.sendMessage("/game stop - Stops a game.");
 			player.sendMessage("/game ignoreMe - (Toggle) Ingore yourself in arena system.");
-			//player.sendMessage("/game setspawn - Set new deathpoint");
-			//player.sendMessage("/game testspawn - Test deathpoint");
+			player.sendMessage("/game setspectpoint - Set new spectate spawnpoint");
+			player.sendMessage("/game testspectpoint - Test spectate spawnpoint");
 		} else if (args.length >= 1) {
 			if (args[0].equalsIgnoreCase("start") && s == 10) {
 				if (this.gameHandler.getPlayerThatCanMatch() > 2) {
@@ -60,13 +58,13 @@ public class GameCommand extends BaseCommand {
 					gameHandler.ignorePlayer(player);
 					player.sendMessage(ChatColor.GREEN + "Du er nå ignorert av arena systemet.");
 				}
-			}/* else if (args[0].equalsIgnoreCase("setspawn") && s == 10) {
-				player.sendMessage(ChatColor.GREEN + "Setting new spawnpoint.");
-				worldconfig.setNewDeathPoint(player.getLocation());
-			} else if (args[0].equalsIgnoreCase("testspawn") && s == 10) {
-				player.sendMessage(ChatColor.GREEN + "Testing spawnpoint.");
-				player.teleport(this.worldconfig.getDeathPointLocation());
-			}*/
+			} else if (args[0].equalsIgnoreCase("setspectpoint") && s == 10) {
+				player.sendMessage(ChatColor.GREEN + "Setting new spectate spawnpoint.");
+				worldconfig.setSpectateSpawnPoint(player.getLocation());
+			} else if (args[0].equalsIgnoreCase("testspectpoint") && s == 10) {
+				player.sendMessage(ChatColor.GREEN + "Testing spectate point.");
+				player.teleport(this.worldconfig.getSpectateSpawnPoint());
+			}
 		}
 		
 		return true;
