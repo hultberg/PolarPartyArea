@@ -102,9 +102,7 @@ public class GameListener implements Listener {
 		
 		this.gameHandler.removePlayer(killed.getName());
 		
-		boolean boolKilled = false;
 		if (killer instanceof Player) {
-			boolKilled = true;
 			killerr = (Player) killer;
 			
 			// Kick killed
@@ -127,8 +125,7 @@ public class GameListener implements Listener {
 		
 		// Kick the player since he/she lost.
 		plugin.setPlayerSpectator(killed);
-		killed.sendMessage("Du " + (boolKilled ? "ble drept av " + killerr.getName() : " døde av naturlige årsaker") + " og er ute, kontakt GameDesk for hjelp.");
-
+		
 		// Check if finished, after adding point.
 		this.gameHandler.checkIfGameFinished();
 	}
