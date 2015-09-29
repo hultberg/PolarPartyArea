@@ -51,6 +51,7 @@ import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 public class PolarPartyArea extends JavaPlugin {
 
 	public static PolarPartyArea ref;
+	public static boolean anyoneHasDiamond;
 	
 	/* Admin ranks */
 	public static int ADMIN_RANK = 10;

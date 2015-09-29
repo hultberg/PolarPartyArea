@@ -1,5 +1,6 @@
 package net.mittnett.edvin.area.PolarPartyArea.listeners;
 
+import org.bukkit.Achievement;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -9,7 +10,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerAchievementAwardedEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
@@ -124,8 +125,13 @@ public class PlayerListener implements Listener {
 	}
 	
 	@EventHandler
-	public void onPlayerInteract(PlayerInteractEvent event) {
+	public void onPlayerAchievementAwarded(PlayerAchievementAwardedEvent event) {
+		event.setCancelled(true);
 		
+		if (!PolarPartyArea.anyoneHasDiamond && event.getAchievement() == Achievement.DIAMONDS_TO_YOU) {
+			PolarPartyArea.anyoneHasDiamond = true;
+			Broadcaster.broadcastAll(ChatColor.GOLD + "Someone found diamond!");
+		}
 	}
 	
 	@EventHandler
