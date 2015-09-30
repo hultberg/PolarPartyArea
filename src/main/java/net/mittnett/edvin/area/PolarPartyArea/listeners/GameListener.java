@@ -26,7 +26,6 @@ import net.mittnett.edvin.area.PolarPartyArea.handlers.UserHandler;
 
 public class GameListener implements Listener {
 	
-	private PolarPartyArea plugin;
 	private GameHandler gameHandler;
 	private WorldConfigurationHandler worldconfig;
 	private LogHandler logHandler;
@@ -34,7 +33,6 @@ public class GameListener implements Listener {
 
 	public GameListener(PolarPartyArea instance)
 	{
-		this.plugin = instance;
 		this.gameHandler = instance.getGameHandler();
 		this.worldconfig = instance.getWorldConfigHandler();
 		this.logHandler = instance.getLogHandler();
@@ -102,7 +100,9 @@ public class GameListener implements Listener {
 		
 		this.gameHandler.removePlayer(killed.getName());
 		
+		boolean boolKilled = false;
 		if (killer instanceof Player) {
+			boolKilled = true;
 			killerr = (Player) killer;
 			
 			// Kick killed
@@ -124,8 +124,8 @@ public class GameListener implements Listener {
 		}
 		
 		// Kick the player since he/she lost.
-		plugin.setPlayerSpectator(killed);
-		
+		killed.kickPlayer("Du " + (boolKilled ? "ble drept av " + killerr.getName() : " døde av naturlige årsaker") + " og er ute, kontakt GameDesk for hjelp.");
+
 		// Check if finished, after adding point.
 		this.gameHandler.checkIfGameFinished();
 	}
